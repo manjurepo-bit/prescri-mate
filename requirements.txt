@@ -22,6 +22,11 @@ python-docx
 torchvision
 faiss-cpu
 grandalf
-
-
+qdrant-client
+bcrypt
+google-generativeai
+networkx
+reportlab
+pillow
+requests
 
