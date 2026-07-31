@@ -4,7 +4,7 @@ from datetime import datetime
 from dotenv import load_dotenv
 load_dotenv(override=True)
 import streamlit as st
-from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw, ImageFont
 
 # Ensure relative imports work
 import sys
@@ -51,47 +51,64 @@ SAMPLE_IMG_PATH = "c:/genai/apps/prescimate/sample_prescription.jpg"
 PDF_DIR = "c:/genai/apps/prescimate/exports"
 os.makedirs(PDF_DIR, exist_ok=True)
 
-# Generate sample prescription image if it does not exist
+# Generate sample prescription image (force-overwrite with high-resolution TrueType fonts)
 def ensure_sample_prescription():
-    if not os.path.exists(SAMPLE_IMG_PATH):
+    try:
+        # Load high-quality system TrueType fonts (handles scaling and anti-aliasing)
         try:
-            # Create a simple high-resolution mock prescription image
-            img = Image.new("RGB", (800, 1000), "white")
-            draw = ImageDraw.Draw(img)
-            
-            # Simple header
-            draw.rectangle([(20, 20), (780, 980)], outline="teal", width=3)
-            draw.text((60, 60), "DR. ARUN SHARMA, MD (CARDIOLOGY)", fill="darkblue")
-            draw.text((60, 85), "Reg No: 12345-A | City Health Clinic, Mumbai", fill="gray")
-            draw.line([(60, 115), (740, 115)], fill="gray", width=2)
-            
-            draw.text((60, 150), "Patient Name: Rajesh Kumar  |  Age: 52  |  Gender: Male", fill="black")
-            draw.text((60, 175), f"Date: {datetime.now().strftime('%d/%m/%Y')}", fill="black")
-            draw.line([(60, 205), (740, 205)], fill="gray", width=1)
-            
-            # Rx Symbol
-            draw.text((60, 230), "Rx", fill="teal")
-            
-            # Prescribed medicines (Aspirin + Warfarin is a major interaction)
-            draw.text((100, 300), "1. Ecosprin 75 mg", fill="black")
-            draw.text((120, 330), "   Dosage: 1 tablet daily after lunch", fill="gray")
-            
-            draw.text((100, 400), "2. Warfarin 5 mg", fill="black")
-            draw.text((120, 430), "   Dosage: 1 tablet daily at 9:00 PM", fill="gray")
-            
-            draw.text((100, 500), "3. Glycomet 500 mg", fill="black")
-            draw.text((120, 530), "   Dosage: 1 tablet twice daily before meals (morning & night)", fill="gray")
-            
-            draw.text((100, 600), "4. Lipvas 10 mg", fill="black")
-            draw.text((120, 630), "   Dosage: 1 tablet at bedtime", fill="gray")
-            
-            draw.text((60, 780), "Please review after 1 month.", fill="black")
-            draw.text((550, 850), "Dr. Arun Sharma", fill="darkblue")
-            draw.text((550, 875), "Authorized Signature", fill="gray")
-            
-            img.save(SAMPLE_IMG_PATH)
-        except Exception as e:
-            print(f"Failed to generate sample prescription image: {e}")
+            font_title = ImageFont.truetype("arial.ttf", 26)
+            font_subtitle = ImageFont.truetype("arial.ttf", 16)
+            font_body_bold = ImageFont.truetype("arial.ttf", 18)
+            font_body = ImageFont.truetype("arial.ttf", 16)
+            font_rx = ImageFont.truetype("arial.ttf", 40)
+        except IOError:
+            font_title = ImageFont.load_default()
+            font_subtitle = font_title
+            font_body_bold = font_title
+            font_body = font_title
+            font_rx = font_title
+
+        # Create a high-resolution canvas
+        img = Image.new("RGB", (800, 1000), "white")
+        draw = ImageDraw.Draw(img)
+        
+        # Border
+        draw.rectangle([(20, 20), (780, 980)], outline="teal", width=4)
+        
+        # Header (Clinic & Doctor Info)
+        draw.text((60, 60), "DR. ARUN SHARMA, MD (CARDIOLOGY)", fill="darkblue", font=font_title)
+        draw.text((60, 95), "Reg No: 12345-A  |  City Health Clinic, Mumbai", fill="gray", font=font_subtitle)
+        draw.line([(60, 125), (740, 125)], fill="gray", width=2)
+        
+        # Patient Details
+        draw.text((60, 150), "Patient Name: Rajesh Kumar  |  Age: 52  |  Gender: Male", fill="black", font=font_body_bold)
+        draw.text((60, 180), f"Date: {datetime.now().strftime('%d/%m/%Y')}", fill="black", font=font_body)
+        draw.line([(60, 210), (740, 210)], fill="gray", width=1)
+        
+        # Rx Symbol
+        draw.text((60, 230), "Rx", fill="teal", font=font_rx)
+        
+        # Prescribed medicines (Aspirin + Warfarin is a major interaction)
+        draw.text((100, 300), "1. Ecosprin 75 mg", fill="black", font=font_body_bold)
+        draw.text((120, 330), "   Dosage: 1 tablet daily after lunch", fill="gray", font=font_body)
+        
+        draw.text((100, 400), "2. Warfarin 5 mg", fill="black", font=font_body_bold)
+        draw.text((120, 430), "   Dosage: 1 tablet daily at 9:00 PM", fill="gray", font=font_body)
+        
+        draw.text((100, 500), "3. Glycomet 500 mg", fill="black", font=font_body_bold)
+        draw.text((120, 530), "   Dosage: 1 tablet twice daily before meals (morning & night)", fill="gray", font=font_body)
+        
+        draw.text((100, 600), "4. Lipvas 10 mg", fill="black", font=font_body_bold)
+        draw.text((120, 630), "   Dosage: 1 tablet at bedtime", fill="gray", font=font_body)
+        
+        # Footer
+        draw.text((60, 780), "Please review after 1 month.", fill="black", font=font_body_bold)
+        draw.text((530, 850), "Dr. Arun Sharma", fill="darkblue", font=font_body_bold)
+        draw.text((530, 875), "Authorized Signature", fill="gray", font=font_subtitle)
+        
+        img.save(SAMPLE_IMG_PATH)
+    except Exception as e:
+        print(f"Failed to generate sample prescription image: {e}")
 
 ensure_sample_prescription()
 
