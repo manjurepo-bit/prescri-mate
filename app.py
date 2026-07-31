@@ -95,6 +95,12 @@ def ensure_sample_prescription():
 
 ensure_sample_prescription()
 
+# Register default test user for testing phase
+try:
+    register_user("test", "password")
+except Exception as e:
+    pass
+
 # Define Pydantic schema for structured output
 class MedicationDetail(BaseModel):
     brand: str = Field(description="The brand name of the medicine written on the prescription")
@@ -209,41 +215,7 @@ if "selected_prescription" not in st.session_state:
 
 # --- User Auth Screens ---
 if st.session_state.current_user is None:
-    # Hide sidebar entirely on mobile screens (max-width: 768px) to prevent overlapping/clutter
-    st.markdown("""
-    <style>
-        @media (max-width: 768px) {
-            [data-testid="stSidebar"], [data-testid="collapsedControl"] {
-                display: none !important;
-            }
-        }
-    </style>
-    """, unsafe_allow_html=True)
-
-    # About card in the sidebar to save main screen height and prevent scrolling
-    with st.sidebar:
-        st.markdown("""
-        <div style='background-color: #f1f5f9; border-radius: 10px; padding: 18px; border-left: 5px solid #0F4C5C; color: #1e293b;'>
-            <h4 style='color: #0F4C5C; margin-top: 0; margin-bottom: 5px;'>💡 About PresciMate</h4>
-            <p style='margin-bottom: 5px; font-size: 0.9rem;'>PresciMate reads a photo of a handwritten prescription and explains it to you in simple terms in your own Indian language (Hindi, Tamil, Bengali, Telugu, and 9 others).</p>
-            <details style='margin-top: 10px; cursor: pointer;'>
-                <summary style='color: #0F4C5C; font-weight: bold; outline: none; font-size: 0.85rem; margin-bottom: 10px;'>More details...</summary>
-                <div style='margin-top: 5px; font-size: 0.85rem;'>
-                    <strong>Why this matters:</strong> In many small towns and villages across India, medical prescriptions are written in English with brand names that are difficult to recognize, and patients often lack access to immediate guidance. PresciMate helps bridge this gap.
-                    <h4 style='color: #0F4C5C; margin-top: 12px; margin-bottom: 5px; font-size: 0.9rem;'>✨ What it does:</h4>
-                    <ul style='margin-top: 0; padding-left: 15px;'>
-                        <li><b>🔒 Private Accounts</b></li>
-                        <li><b>🗣️ Multilingual script</b></li>
-                        <li><b>⚠️ Interaction checks</b></li>
-                        <li><b>📥 PDF Reports</b></li>
-                        <li><b>👨‍⚕️ Doctor-first policy</b></li>
-                    </ul>
-                </div>
-            </details>
-        </div>
-        """, unsafe_allow_html=True)
-
-    st.markdown("<h1 style='text-align: center; color: #0F4C5C; margin-top: -30px;'>PresciMate 💊</h1>", unsafe_allow_html=True)
+    st.markdown("<h1 style='text-align: center; color: #0F4C5C;'>PresciMate 💊</h1>", unsafe_allow_html=True)
     st.markdown("<p style='text-align: center; font-size: 1.15rem; margin-bottom: 5px;'>Your plain-language medical prescription guide in your own Indian language.</p>", unsafe_allow_html=True)
     st.write("---")
     col1, col2, col3 = st.columns([1, 2, 1])
@@ -252,8 +224,8 @@ if st.session_state.current_user is None:
         
         with auth_tab1:
             st.write("### Sign In")
-            login_user = st.text_input("Username", key="login_user_key")
-            login_pass = st.text_input("Password", type="password", key="login_pass_key")
+            login_user = st.text_input("Username", value="test", key="login_user_key")
+            login_pass = st.text_input("Password", value="password", type="password", key="login_pass_key")
             if st.button("Login", use_container_width=True):
                 user = authenticate_user(login_user, login_pass)
                 if user:
@@ -279,6 +251,28 @@ if st.session_state.current_user is None:
                         st.success("Account created successfully! Please switch to the Login tab.")
                     else:
                         st.error(msg)
+                        
+        # Render About card directly below the login form (main screen col2)
+        st.markdown("""
+        <div style='background-color: #f1f5f9; border-radius: 10px; padding: 18px; border-left: 5px solid #0F4C5C; color: #1e293b; margin-top: 20px;'>
+            <h4 style='color: #0F4C5C; margin-top: 0; margin-bottom: 5px;'>💡 About PresciMate</h4>
+            <p style='margin-bottom: 5px; font-size: 0.9rem;'>PresciMate reads a photo of a handwritten prescription and explains it to you in simple terms in your own Indian language (Hindi, Tamil, Bengali, Telugu, and 9 others).</p>
+            <details style='margin-top: 10px; cursor: pointer;'>
+                <summary style='color: #0F4C5C; font-weight: bold; outline: none; font-size: 0.85rem; margin-bottom: 10px;'>More details...</summary>
+                <div style='margin-top: 5px; font-size: 0.85rem;'>
+                    <strong>Why this matters:</strong> In many small towns and villages across India, medical prescriptions are written in English with brand names that are difficult to recognize, and patients often lack access to immediate guidance. PresciMate helps bridge this gap.
+                    <h4 style='color: #0F4C5C; margin-top: 12px; margin-bottom: 5px; font-size: 0.9rem;'>✨ What it does:</h4>
+                    <ul style='margin-top: 0; padding-left: 15px;'>
+                        <li><b>🔒 Private Accounts</b></li>
+                        <li><b>🗣️ Multilingual script</b></li>
+                        <li><b>⚠️ Interaction checks</b></li>
+                        <li><b>📥 PDF Reports</b></li>
+                        <li><b>👨‍⚕️ Doctor-first policy</b></li>
+                    </ul>
+                </div>
+            </details>
+        </div>
+        """, unsafe_allow_html=True)
                         
     st.stop()
 
