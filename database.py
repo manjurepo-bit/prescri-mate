@@ -132,7 +132,7 @@ def get_dense_embedding(text, is_query=False):
     task_type = "retrieval_query" if is_query else "retrieval_document"
     try:
         response = genai.embed_content(
-            model="models/text-embedding-004",
+            model="models/gemini-embedding-001",
             content=text,
             task_type=task_type
         )
