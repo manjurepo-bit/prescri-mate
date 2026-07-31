@@ -211,8 +211,25 @@ if "selected_prescription" not in st.session_state:
 if st.session_state.current_user is None:
     st.markdown("<h1 style='text-align: center; color: #0F4C5C;'>PresciMate 💊</h1>", unsafe_allow_html=True)
     st.markdown("<p style='text-align: center; font-size: 1.2rem;'>Your plain-language medical prescription guide in your own Indian language.</p>", unsafe_allow_html=True)
-    st.write("---")
     
+    # Guest page info card
+    st.markdown("""
+    <div style='background-color: #f1f5f9; border-radius: 10px; padding: 20px; margin-bottom: 25px; border-left: 5px solid #0F4C5C; color: #1e293b;'>
+        <h4 style='color: #0F4C5C; margin-top: 0;'>💡 About PresciMate</h4>
+        <p style='margin-bottom: 8px;'>PresciMate reads a photo of a handwritten prescription and explains it to you in simple terms in your own Indian language (Hindi, Tamil, Bengali, Telugu, and 8 others).</p>
+        <strong>Why this matters:</strong> In many small towns and villages across India, medical prescriptions are written in English with brand names that are difficult to recognize, and patients often lack access to immediate guidance. PresciMate helps bridge this gap.
+        <h4 style='color: #0F4C5C; margin-top: 15px; margin-bottom: 5px;'>✨ What it does:</h4>
+        <ul style='margin-top: 0; padding-left: 20px;'>
+            <li><b>🔒 Private Accounts</b>: Sign up first—all your health documents remain private and secure to your account.</li>
+            <li><b>🗣️ Multilingual Explanations</b>: Translates active ingredients, dosage instructions, and warnings into your native script.</li>
+            <li><b>⚠️ Drug Interaction Checks</b>: Automatically audits and flags potential conflicts between medications.</li>
+            <li><b>📥 PDF Downloads</b>: Generate and download clean PDF reports to print or keep on your phone.</li>
+            <li><b>👨‍⚕️ Doctor-First Policy</b>: Designed to educate, never to replace professional medical advice. Always consult your physician.</li>
+        </ul>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    st.write("---")
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
         auth_tab1, auth_tab2 = st.tabs(["🔒 Login to Account", "👤 Create New Account"])
@@ -284,6 +301,23 @@ with st.sidebar:
 # --- Main Window Dashboard ---
 st.markdown("<div class='logo-container'><h1 class='main-header'>PresciMate 💊</h1></div>", unsafe_allow_html=True)
 st.write("Translate prescription brand names into plain language and check for interactions instantly.")
+
+# Dashboard info expander
+with st.expander("ℹ️ How PresciMate Works & About the App", expanded=False):
+    st.markdown("""
+    ### **PresciMate 💊** — Your Local Language Prescription Guide
+    
+    **Why?**
+    In many parts of India, prescriptions are written in English using brand names that patients don't recognize, and there is often no one nearby to explain them clearly. PresciMate was built to solve this problem.
+    
+    **What it does:**
+    * 📤 **Upload or Photograph**: Take a picture of your prescription or upload an image.
+    * 🔒 **Private & Secure**: All prescriptions are saved securely in your private history.
+    * 🗣️ **Indian Languages Support**: Explains the prescription in Hindi, Tamil, Bengali, Telugu, Marathi, Gujarati, Kannada, Malayalam, Odia, Punjabi, Assamese, or Urdu.
+    * ⚠️ **Drug Interaction Audit**: Scans for potentially dangerous drug-drug interactions.
+    * 📥 **PDF Exports**: Download a copy of your analysis report to save or share.
+    * 🩺 **Doctor-First**: Always verify information with your doctor before making changes to your health regimen.
+    """)
 
 # Banner displaying current selection or mode
 if st.session_state.selected_prescription:
