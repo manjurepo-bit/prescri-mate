@@ -112,9 +112,9 @@ def analyze_prescription_image(image: Image.Image, target_lang_name: str) -> Pre
     """Invokes Gemini's structured output generation on the prescription image."""
     model = genai.GenerativeModel("gemini-3.5-flash")
     prompt = f"""Analyze this handwritten prescription image. Extract all the medications listed, identifying both their brand names and generic/active ingredient names, dosages, and purposes. 
-Explain it in simple, plain terms that an ordinary person would understand. Be warm and supportive, but clear. Always emphasize checking in with their doctor.
+Explain it in simple, plain, and concise terms (avoiding verbose filler) that an ordinary person would understand. Be warm and supportive, but clear. Always emphasize checking in with their doctor.
 
-IMPORTANT: In the 'translated_explanation' field, write the complete translation of the overall explanation, dosages, and warnings directly into {target_lang_name} using its native script (e.g. Devanagari for Hindi)."""
+IMPORTANT: In the 'translated_explanation' field, write the complete translation of the overall explanation, dosages, and warnings directly into {target_lang_name} using its native script (e.g. Devanagari for Hindi). Keep descriptions clear and concise."""
     
     response = model.generate_content(
         [prompt, image],
@@ -350,18 +350,19 @@ if st.session_state.selected_prescription:
     
     dt_str = datetime.fromisoformat(current_presc['timestamp']).strftime("%d/%m/%Y")
     
-    # Generate the PDF file on demand
-    generate_pdf_explanation(
-        pdf_path,
-        user["username"],
-        current_presc["image_name"],
-        dt_str,
-        meds_data,
-        current_presc["explanation"],
-        current_presc["lang_code"],
-        current_presc["translated_explanation"],
-        interactions
-    )
+    # Generate the PDF file on demand (only if it doesn't already exist)
+    if not os.path.exists(pdf_path):
+        generate_pdf_explanation(
+            pdf_path,
+            user["username"],
+            current_presc["image_name"],
+            dt_str,
+            meds_data,
+            current_presc["explanation"],
+            current_presc["lang_code"],
+            current_presc["translated_explanation"],
+            interactions
+        )
     
     with open(pdf_path, "rb") as f:
         pdf_bytes = f.read()

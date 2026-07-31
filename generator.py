@@ -8,6 +8,7 @@ from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 
 from translator import LANGUAGES
+import streamlit as st
 
 # Fonts path
 FONTS_DIR = "c:/genai/apps/prescimate/fonts"
@@ -77,6 +78,7 @@ LANGUAGE_FONTS = {
     }
 }
 
+@st.cache_resource
 def get_registered_font(lang_name):
     """
     Downloads and registers the TrueType font for the target language.
