@@ -1,0 +1,6 @@
+qdrant_db/
+exports/
+fonts/
+__pycache__/
+*.pyc
+.env
