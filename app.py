@@ -204,6 +204,16 @@ st.markdown("""
         display: inline-block;
         margin-right: 5px;
     }
+    
+    /* Hide Streamlit header, footer, MainMenu, and deployment badges */
+    #MainMenu {visibility: hidden;}
+    footer {visibility: hidden;}
+    header {visibility: hidden;}
+    .stAppDeployButton {display: none !important;}
+    .viewerBadge {display: none !important;}
+    .stViewerBadge {display: none !important;}
+    div.viewerBadge {display: none !important;}
+    a.viewerBadge {display: none !important;}
 </style>
 """, unsafe_allow_html=True)
 
