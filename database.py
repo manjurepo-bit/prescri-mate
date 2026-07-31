@@ -7,7 +7,7 @@ import numpy as np
 from collections import Counter
 from datetime import datetime
 from dotenv import load_dotenv
-load_dotenv()
+load_dotenv(override=True)
 from qdrant_client import QdrantClient, models
 import google.generativeai as genai
 
