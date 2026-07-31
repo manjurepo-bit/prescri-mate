@@ -209,6 +209,17 @@ if "selected_prescription" not in st.session_state:
 
 # --- User Auth Screens ---
 if st.session_state.current_user is None:
+    # Hide sidebar entirely on mobile screens (max-width: 768px) to prevent overlapping/clutter
+    st.markdown("""
+    <style>
+        @media (max-width: 768px) {
+            [data-testid="stSidebar"], [data-testid="collapsedControl"] {
+                display: none !important;
+            }
+        }
+    </style>
+    """, unsafe_allow_html=True)
+
     # About card in the sidebar to save main screen height and prevent scrolling
     with st.sidebar:
         st.markdown("""
