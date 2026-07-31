@@ -209,31 +209,31 @@ if "selected_prescription" not in st.session_state:
 
 # --- User Auth Screens ---
 if st.session_state.current_user is None:
-    st.markdown("<h1 style='text-align: center; color: #0F4C5C;'>PresciMate 💊</h1>", unsafe_allow_html=True)
-    st.markdown("<p style='text-align: center; font-size: 1.2rem;'>Your plain-language medical prescription guide in your own Indian language.</p>", unsafe_allow_html=True)
-    
-    # Guest page info card
-    st.markdown("""
-    <div style='background-color: #f1f5f9; border-radius: 10px; padding: 20px; margin-bottom: 25px; border-left: 5px solid #0F4C5C; color: #1e293b;'>
-        <h4 style='color: #0F4C5C; margin-top: 0; margin-bottom: 5px;'>💡 About PresciMate</h4>
-        <p style='margin-bottom: 5px;'>PresciMate reads a photo of a handwritten prescription and explains it to you in simple terms in your own Indian language (Hindi, Tamil, Bengali, Telugu, and 9 others).</p>
-        <details style='margin-top: 10px; cursor: pointer;'>
-            <summary style='color: #0F4C5C; font-weight: bold; outline: none; margin-bottom: 10px;'>More details...</summary>
-            <div style='margin-top: 5px;'>
-                <strong>Why this matters:</strong> In many small towns and villages across India, medical prescriptions are written in English with brand names that are difficult to recognize, and patients often lack access to immediate guidance. PresciMate helps bridge this gap.
-                <h4 style='color: #0F4C5C; margin-top: 15px; margin-bottom: 5px;'>✨ What it does:</h4>
-                <ul style='margin-top: 0; padding-left: 20px;'>
-                    <li><b>🔒 Private Accounts</b>: Sign up first—all your health documents remain private and secure to your account.</li>
-                    <li><b>🗣️ Multilingual Explanations</b>: Translates active ingredients, dosage instructions, and warnings into your native script.</li>
-                    <li><b>⚠️ Drug Interaction Checks</b>: Automatically audits and flags potential conflicts between medications.</li>
-                    <li><b>📥 PDF Downloads</b>: Generate and download clean PDF reports to print or keep on your phone.</li>
-                    <li><b>👨‍⚕️ Doctor-First Policy</b>: Designed to educate, never to replace professional medical advice. Always consult your physician.</li>
-                </ul>
-            </div>
-        </details>
-    </div>
-    """, unsafe_allow_html=True)
-    
+    # About card in the sidebar to save main screen height and prevent scrolling
+    with st.sidebar:
+        st.markdown("""
+        <div style='background-color: #f1f5f9; border-radius: 10px; padding: 18px; border-left: 5px solid #0F4C5C; color: #1e293b;'>
+            <h4 style='color: #0F4C5C; margin-top: 0; margin-bottom: 5px;'>💡 About PresciMate</h4>
+            <p style='margin-bottom: 5px; font-size: 0.9rem;'>PresciMate reads a photo of a handwritten prescription and explains it to you in simple terms in your own Indian language (Hindi, Tamil, Bengali, Telugu, and 9 others).</p>
+            <details style='margin-top: 10px; cursor: pointer;'>
+                <summary style='color: #0F4C5C; font-weight: bold; outline: none; font-size: 0.85rem; margin-bottom: 10px;'>More details...</summary>
+                <div style='margin-top: 5px; font-size: 0.85rem;'>
+                    <strong>Why this matters:</strong> In many small towns and villages across India, medical prescriptions are written in English with brand names that are difficult to recognize, and patients often lack access to immediate guidance. PresciMate helps bridge this gap.
+                    <h4 style='color: #0F4C5C; margin-top: 12px; margin-bottom: 5px; font-size: 0.9rem;'>✨ What it does:</h4>
+                    <ul style='margin-top: 0; padding-left: 15px;'>
+                        <li><b>🔒 Private Accounts</b></li>
+                        <li><b>🗣️ Multilingual script</b></li>
+                        <li><b>⚠️ Interaction checks</b></li>
+                        <li><b>📥 PDF Reports</b></li>
+                        <li><b>👨‍⚕️ Doctor-first policy</b></li>
+                    </ul>
+                </div>
+            </details>
+        </div>
+        """, unsafe_allow_html=True)
+
+    st.markdown("<h1 style='text-align: center; color: #0F4C5C; margin-top: -30px;'>PresciMate 💊</h1>", unsafe_allow_html=True)
+    st.markdown("<p style='text-align: center; font-size: 1.15rem; margin-bottom: 5px;'>Your plain-language medical prescription guide in your own Indian language.</p>", unsafe_allow_html=True)
     st.write("---")
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
