@@ -279,14 +279,7 @@ if st.session_state.current_user is None:
                     else:
                         st.error(msg)
                         
-        # Render Workflow & Technology link directly below the login form (main screen col2)
-        st.markdown("""
-        <div style='text-align: center; margin-top: 20px;'>
-            <a href='https://github.com/manjurepo-bit/prescri-mate/blob/main/workflow_and_technology.md' target='_blank' style='color: #0F4C5C; font-weight: bold; text-decoration: none; font-size: 0.92rem;'>
-                📖 Learn about the Workflow & Technology Used
-            </a>
-        </div>
-        """, unsafe_allow_html=True)
+
                         
     st.stop()
 
@@ -326,14 +319,28 @@ with st.sidebar:
 st.markdown("<div class='logo-container'><h1 class='main-header'>PresciMate 💊</h1></div>", unsafe_allow_html=True)
 st.write("Translate prescription brand names into plain language and check for interactions instantly.")
 
-# Dashboard info link
-st.markdown("""
-<div style='margin-bottom: 15px; margin-top: -10px;'>
-    <a href='https://github.com/manjurepo-bit/prescri-mate/blob/main/workflow_and_technology.md' target='_blank' style='color: #0F4C5C; font-weight: bold; text-decoration: none; font-size: 0.9rem;'>
-        📖 Read Workflow & Technology Stack Documentation
-    </a>
-</div>
-""", unsafe_allow_html=True)
+# Collapsible expander displaying technical details (only visible to logged-in users, no GitHub links)
+with st.expander("🛠️ Technical Workflow & Technology Stack Details", expanded=False):
+    st.markdown("""
+    ### **PresciMate Technical Architecture**
+    
+    PresciMate is built on a hybrid architecture of LLM APIs, vector retrieval, and graph analytics:
+    
+    * **Frontend**: Streamlit dashboard with custom CSS theme, responsive columns, and tabs.
+    * **OCR & AI Extraction**: Google Gemini API (`gemini-3.5-flash`) extracts medications, dosages, and purposes using a Pydantic-enforced structured JSON schema.
+    * **Drug-Drug Interaction**: Built on **NetworkX**. It audits drug generic names against a graph database of critical pharmacological conflicts.
+    * **Translations**: Supports 12 regional languages using **Sarvam AI Translation API** (with fallback to Gemini).
+    * **Database**: Ephemeral in-memory **Qdrant Vector Database** storing dense embeddings (`gemini-embedding-001`) of history entries.
+    * **Report Exports**: Generates multi-page **ReportLab PDFs** on demand, dynamically loading Google Noto scripts for accurate language displays.
+    
+    ---
+    ### **System Processing Pipeline**
+    1. **OCR & Parsing**: Handwritten prescription image is scanned by Gemini to extract structured brand/generic medication details.
+    2. **Interaction Audit**: Generics are compared against the NetworkX interaction graph to flag moderate/major warnings.
+    3. **Language Translation**: Summary is translated into the target script (Devanagari, Tamil, etc.).
+    4. **Memory Storing**: Record is vector-embedded and indexed in Qdrant.
+    5. **Report Generation**: A customized ReportLab PDF is generated for download.
+    """)
 
 # Banner displaying current selection or mode
 if st.session_state.selected_prescription:
