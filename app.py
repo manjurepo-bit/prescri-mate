@@ -279,25 +279,12 @@ if st.session_state.current_user is None:
                     else:
                         st.error(msg)
                         
-        # Render About card directly below the login form (main screen col2)
+        # Render Workflow & Technology link directly below the login form (main screen col2)
         st.markdown("""
-        <div style='background-color: #f1f5f9; border-radius: 10px; padding: 18px; border-left: 5px solid #0F4C5C; color: #1e293b; margin-top: 20px;'>
-            <h4 style='color: #0F4C5C; margin-top: 0; margin-bottom: 5px;'>💡 About PresciMate</h4>
-            <p style='margin-bottom: 5px; font-size: 0.9rem;'>PresciMate reads a photo of a handwritten prescription and explains it to you in simple terms in your own Indian language (Hindi, Tamil, Bengali, Telugu, and 9 others).</p>
-            <details style='margin-top: 10px; cursor: pointer;'>
-                <summary style='color: #0F4C5C; font-weight: bold; outline: none; font-size: 0.85rem; margin-bottom: 10px;'>More details...</summary>
-                <div style='margin-top: 5px; font-size: 0.85rem;'>
-                    <strong>Why this matters:</strong> In many small towns and villages across India, medical prescriptions are written in English with brand names that are difficult to recognize, and patients often lack access to immediate guidance. PresciMate helps bridge this gap.
-                    <h4 style='color: #0F4C5C; margin-top: 12px; margin-bottom: 5px; font-size: 0.9rem;'>✨ What it does:</h4>
-                    <ul style='margin-top: 0; padding-left: 15px;'>
-                        <li><b>🔒 Private Accounts</b></li>
-                        <li><b>🗣️ Multilingual script</b></li>
-                        <li><b>⚠️ Interaction checks</b></li>
-                        <li><b>📥 PDF Reports</b></li>
-                        <li><b>👨‍⚕️ Doctor-first policy</b></li>
-                    </ul>
-                </div>
-            </details>
+        <div style='text-align: center; margin-top: 20px;'>
+            <a href='https://github.com/manjurepo-bit/prescri-mate/blob/main/workflow_and_technology.md' target='_blank' style='color: #0F4C5C; font-weight: bold; text-decoration: none; font-size: 0.92rem;'>
+                📖 Learn about the Workflow & Technology Used
+            </a>
         </div>
         """, unsafe_allow_html=True)
                         
@@ -339,22 +326,14 @@ with st.sidebar:
 st.markdown("<div class='logo-container'><h1 class='main-header'>PresciMate 💊</h1></div>", unsafe_allow_html=True)
 st.write("Translate prescription brand names into plain language and check for interactions instantly.")
 
-# Dashboard info expander
-with st.expander("ℹ️ How PresciMate Works & About the App", expanded=False):
-    st.markdown("""
-    ### **PresciMate 💊** — Your Local Language Prescription Guide
-    
-    **Why?**
-    In many parts of India, prescriptions are written in English using brand names that patients don't recognize, and there is often no one nearby to explain them clearly. PresciMate was built to solve this problem.
-    
-    **What it does:**
-    * 📤 **Upload or Photograph**: Take a picture of your prescription or upload an image.
-    * 🔒 **Private & Secure**: All prescriptions are saved securely in your private history.
-    * 🗣️ **Indian Languages Support**: Explains the prescription in Hindi, Tamil, Bengali, Telugu, Marathi, Gujarati, Kannada, Malayalam, Odia, Punjabi, Assamese, or Urdu.
-    * ⚠️ **Drug Interaction Audit**: Scans for potentially dangerous drug-drug interactions.
-    * 📥 **PDF Exports**: Download a copy of your analysis report to save or share.
-    * 🩺 **Doctor-First**: Always verify information with your doctor before making changes to your health regimen.
-    """)
+# Dashboard info link
+st.markdown("""
+<div style='margin-bottom: 15px; margin-top: -10px;'>
+    <a href='https://github.com/manjurepo-bit/prescri-mate/blob/main/workflow_and_technology.md' target='_blank' style='color: #0F4C5C; font-weight: bold; text-decoration: none; font-size: 0.9rem;'>
+        📖 Read Workflow & Technology Stack Documentation
+    </a>
+</div>
+""", unsafe_allow_html=True)
 
 # Banner displaying current selection or mode
 if st.session_state.selected_prescription:
