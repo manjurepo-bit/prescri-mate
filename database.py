@@ -109,9 +109,9 @@ def init_collections():
         )
     
     # 2. Prescriptions collection (Single Dense Vector)
-    if not client.collection_exists("prescriptions"):
+    if not client.collection_exists("prescriptions_v2"):
         client.create_collection(
-            collection_name="prescriptions",
+            collection_name="prescriptions_v2",
             vectors_config=models.VectorParams(size=768, distance=models.Distance.COSINE)
         )
 
@@ -195,7 +195,7 @@ def save_prescription(user_id, image_name, extracted_text, raw_meds, explanation
     presc_id = str(uuid.uuid4())
     
     client.upsert(
-        collection_name="prescriptions",
+        collection_name="prescriptions_v2",
         points=[
             models.PointStruct(
                 id=presc_id,
@@ -229,7 +229,7 @@ def get_user_history(user_id, search_query=None):
     if not search_query:
         # Regular scroll retrieval (sorted by date inside python, or scroll limits)
         result = client.scroll(
-            collection_name="prescriptions",
+            collection_name="prescriptions_v2",
             scroll_filter=user_filter,
             limit=50
         )
@@ -244,7 +244,7 @@ def get_user_history(user_id, search_query=None):
     
     try:
         dense_search = client.search(
-            collection_name="prescriptions",
+            collection_name="prescriptions_v2",
             query_vector=query_dense,
             query_filter=user_filter,
             limit=10
