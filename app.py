@@ -280,25 +280,26 @@ if st.session_state.current_user is None:
                         st.error(msg)
                         
         # Render About application information card directly below the login/signup form (col2)
-        st.markdown("""
-        <div style='background-color: #f1f5f9; border-radius: 10px; padding: 18px; border-left: 5px solid #0F4C5C; color: #1e293b; margin-top: 25px;'>
-            <h4 style='color: #0F4C5C; margin-top: 0; margin-bottom: 5px;'>💡 About PresciMate</h4>
-            <p style='margin-bottom: 8px; font-size: 0.92rem;'>PresciMate reads a photo of a handwritten prescription and explains it to you in simple terms in your own Indian language (Hindi, Tamil, Bengali, Telugu, and 9 others).</p>
-            
-            <h5 style='color: #0F4C5C; margin-top: 15px; margin-bottom: 5px;'>🩺 Why?</h5>
-            <p style='font-size: 0.88rem; margin-top: 0;'>In a lot of small towns/villages in India, a prescription comes in English with brand names nobody recognizes, and there's no one around to explain what it actually means. Wanted to fix that.</p>
-            
-            <h5 style='color: #0F4C5C; margin-top: 15px; margin-bottom: 5px;'>✨ What it does:</h5>
-            <ul style='margin-top: 0; padding-left: 20px; font-size: 0.88rem; line-height: 1.4;'>
-                <li><b>Upload or photograph a prescription</b>: Supports direct file upload or mobile camera integration.</li>
-                <li><b>Sign up first</b>: Secure authentication to ensure everything stays private and custom to your account.</li>
-                <li><b>Get it explained in your own language</b>: Extracts active ingredients, explanation of purpose, dosage instructions, and warnings in the native script of 12 Indian languages.</li>
-                <li><b>Flags drug-drug interactions</b>: Automatically checks if prescribed medicines have potential moderate or major adverse interactions.</li>
-                <li><b>Download explanation as a PDF</b>: Instantly generates clean, portable reports formatted with Indian language fonts.</li>
-                <li><b>Doctor-First Policy</b>: Always points patients back to their doctor, prioritizing safety and professional medical advice.</li>
-            </ul>
-        </div>
-        """, unsafe_allow_html=True)
+        st.markdown(
+            """<div style='background-color: #f1f5f9; border-radius: 10px; padding: 18px; border-left: 5px solid #0F4C5C; color: #1e293b; margin-top: 25px;'>
+<h4 style='color: #0F4C5C; margin-top: 0; margin-bottom: 5px;'>💡 About PresciMate</h4>
+<p style='margin-bottom: 8px; font-size: 0.92rem;'>PresciMate reads a photo of a handwritten prescription and explains it to you in simple terms in your own Indian language (Hindi, Tamil, Bengali, Telugu, and 9 others).</p>
+
+<h5 style='color: #0F4C5C; margin-top: 15px; margin-bottom: 5px;'>🩺 Why?</h5>
+<p style='font-size: 0.88rem; margin-top: 0;'>In a lot of small towns/villages in India, a prescription comes in English with brand names nobody recognizes, and there's no one around to explain what it actually means. Wanted to fix that.</p>
+
+<h5 style='color: #0F4C5C; margin-top: 15px; margin-bottom: 5px;'>✨ What it does:</h5>
+<ul style='margin-top: 0; padding-left: 20px; font-size: 0.88rem; line-height: 1.4;'>
+<li><b>Upload or photograph a prescription</b>: Supports direct file upload or mobile camera integration.</li>
+<li><b>Sign up first</b>: Secure authentication to ensure everything stays private and custom to your account.</li>
+<li><b>Get it explained in your own language</b>: Extracts active ingredients, explanation of purpose, dosage instructions, and warnings in the native script of 12 Indian languages.</li>
+<li><b>Flags drug-drug interactions</b>: Automatically checks if prescribed medicines have potential moderate or major adverse interactions.</li>
+<li><b>Download explanation as a PDF</b>: Instantly generates clean, portable reports formatted with Indian language fonts.</li>
+<li><b>Doctor-First Policy</b>: Always points patients back to their doctor, prioritizing safety and professional medical advice.</li>
+</ul>
+</div>""",
+            unsafe_allow_html=True
+        )
     st.stop()
 
 # --- Authenticated App ---
