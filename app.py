@@ -508,19 +508,54 @@ else:
             
         if image is None:
             st.error("Please provide an image of a prescription first.")
-        elif not GEMINI_API_KEY:
+        elif not use_demo and not GEMINI_API_KEY:
             st.error("GEMINI_API_KEY environment variable is not configured. Cannot process OCR.")
         else:
             # PROCESS PRESCRIPTION
             with st.spinner("Processing... Please wait."):
-                
-                # 1. OCR and analysis using Gemini
-                st.write("🔍 Running Gemini Vision OCR & Medicine extraction (with single-pass translation)...")
-                try:
-                    analysis = analyze_prescription_image(image, lang_selection)
-                except Exception as e:
-                    st.error(f"Failed to analyze image: {e}")
-                    st.stop()
+                if use_demo:
+                    st.write("📊 Retrieving pre-configured mock data for the demo prescription...")
+                    import time
+                    time.sleep(0.5) # Fast local response
+                    
+                    analysis = {
+                        "medications": [
+                            {
+                                "brand": "Ecosprin 75 mg",
+                                "generic": "aspirin",
+                                "dosage": "1 tablet daily after lunch",
+                                "purpose": "Blood thinner to prevent heart attacks and strokes."
+                            },
+                            {
+                                "brand": "Warfarin 5 mg",
+                                "generic": "warfarin",
+                                "dosage": "1 tablet daily at 9:00 PM",
+                                "purpose": "Blood thinner to treat or prevent blood clots."
+                            },
+                            {
+                                "brand": "Glycomet 500 mg",
+                                "generic": "metformin",
+                                "dosage": "1 tablet twice daily before meals (morning & night)",
+                                "purpose": "Blood sugar regulation for managing Type 2 Diabetes."
+                            },
+                            {
+                                "brand": "Lipvas 10 mg",
+                                "generic": "atorvastatin",
+                                "dosage": "1 tablet at bedtime",
+                                "purpose": "Lowers high cholesterol and protects cardiovascular health."
+                            }
+                        ],
+                        "english_explanation": "This prescription has been issued for managing cardiovascular health (heart protection), blood thickness, and Type 2 diabetes. It is a combined therapy to keep your blood flowing smoothly and regulate your blood sugar.",
+                        "what_to_watch_out_for": "1. Bleeding Risk: Ecosprin (Aspirin) and Warfarin are both blood thinners. Using them together dramatically increases the risk of internal bleeding. Monitor for unusual bruising, nosebleeds, or dark stools.\n2. Diabetes check: Monitor your blood sugar regularly while on Glycomet.\n3. Take Lipvas at bedtime as cholesterol synthesis peaks during sleep."
+                    }
+                else:
+                    # 1. OCR and analysis using Gemini
+                    st.write("🔍 Running Gemini Vision OCR & Medicine extraction (with single-pass translation)...")
+                    try:
+                        analysis = analyze_prescription_image(image, lang_selection)
+                    except Exception as e:
+                        st.error(f"Failed to analyze image: {e}")
+                        st.stop()
                     
                 # 2. Interactions Graph Check
                 st.write("🕸️ Performing NetworkX GraphRAG drug-drug interaction audit...")
@@ -554,11 +589,18 @@ else:
                     st.write(f"🗣️ Translating medical explanation to {lang_selection} using Sarvam AI...")
                     translated_expl = translate_explanation(full_eng_explanation, lang_selection)
                 else:
-                    st.write(f"🗣️ Retrieving translation to {lang_selection} from single-pass analysis output...")
-                    translated_expl = analysis.get("translated_explanation", "")
-                    if not translated_expl:
-                        # Direct fallback
-                        translated_expl = translate_explanation(full_eng_explanation, lang_selection)
+                    st.write(f"🗣️ Retrieving translation to {lang_selection}...")
+                    if use_demo:
+                        # Translate the mock summary on the fly if key is present, otherwise show English
+                        if GEMINI_API_KEY:
+                            translated_expl = translate_explanation(full_eng_explanation, lang_selection)
+                        else:
+                            translated_expl = f"[Demo Translation Mode - API Key Missing. Showing English]:\n\n" + full_eng_explanation
+                    else:
+                        translated_expl = analysis.get("translated_explanation", "")
+                        if not translated_expl:
+                            # Direct fallback
+                            translated_expl = translate_explanation(full_eng_explanation, lang_selection)
                 
                 # 5. Save in database (Qdrant)
                 st.write("💾 Storing record in Qdrant database...")
