@@ -109,10 +109,10 @@ def init_collections():
         )
     
     # 2. Prescriptions collection (Single Dense Vector)
-    if not client.collection_exists("prescriptions_v2"):
+    if not client.collection_exists("prescriptions_v3"):
         client.create_collection(
-            collection_name="prescriptions_v2",
-            vectors_config=models.VectorParams(size=768, distance=models.Distance.COSINE)
+            collection_name="prescriptions_v3",
+            vectors_config=models.VectorParams(size=3072, distance=models.Distance.COSINE)
         )
 
 # Initialize on import
@@ -122,7 +122,7 @@ def get_dense_embedding(text, is_query=False):
     """Obtain dense embeddings using Gemini's text-embedding-004."""
     if not GEMINI_API_KEY:
         # Return dummy vector if API key is missing for any reason
-        return [0.0] * 768
+        return [0.0] * 3072
     
     task_type = "retrieval_query" if is_query else "retrieval_document"
     try:
@@ -195,7 +195,7 @@ def save_prescription(user_id, image_name, extracted_text, raw_meds, explanation
     presc_id = str(uuid.uuid4())
     
     client.upsert(
-        collection_name="prescriptions_v2",
+        collection_name="prescriptions_v3",
         points=[
             models.PointStruct(
                 id=presc_id,
@@ -229,7 +229,7 @@ def get_user_history(user_id, search_query=None):
     if not search_query:
         # Regular scroll retrieval (sorted by date inside python, or scroll limits)
         result = client.scroll(
-            collection_name="prescriptions_v2",
+            collection_name="prescriptions_v3",
             scroll_filter=user_filter,
             limit=50
         )
@@ -244,7 +244,7 @@ def get_user_history(user_id, search_query=None):
     
     try:
         dense_search = client.search(
-            collection_name="prescriptions_v2",
+            collection_name="prescriptions_v3",
             query_vector=query_dense,
             query_filter=user_filter,
             limit=10
