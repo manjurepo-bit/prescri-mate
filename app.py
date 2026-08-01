@@ -285,6 +285,9 @@ if st.session_state.current_user is None:
 <h4 style='color: #0F4C5C; margin-top: 0; margin-bottom: 5px;'>💡 About PresciMate</h4>
 <p style='margin-bottom: 8px; font-size: 0.92rem;'>PresciMate reads a photo of a handwritten prescription and explains it to you in simple terms in your own Indian language (Hindi, Tamil, Bengali, Telugu, and 9 others).</p>
 
+<details style='margin-top: 12px; cursor: pointer;'>
+<summary style='color: #0F4C5C; font-weight: bold; outline: none; font-size: 0.88rem;'>Show More Details...</summary>
+
 <h5 style='color: #0F4C5C; margin-top: 15px; margin-bottom: 5px;'>🩺 Why?</h5>
 <p style='font-size: 0.88rem; margin-top: 0;'>In a lot of small towns/villages in India, a prescription comes in English with brand names nobody recognizes, and there's no one around to explain what it actually means. Wanted to fix that.</p>
 
@@ -297,6 +300,7 @@ if st.session_state.current_user is None:
 <li><b>Download explanation as a PDF</b>: Instantly generates clean, portable reports formatted with Indian language fonts.</li>
 <li><b>Doctor-First Policy</b>: Always points patients back to their doctor, prioritizing safety and professional medical advice.</li>
 </ul>
+</details>
 </div>""",
             unsafe_allow_html=True
         )
