@@ -108,16 +108,11 @@ def init_collections():
             vectors_config=models.VectorParams(size=768, distance=models.Distance.COSINE)
         )
     
-    # 2. Prescriptions collection (Hybrid Dense + Sparse)
+    # 2. Prescriptions collection (Single Dense Vector)
     if not client.collection_exists("prescriptions"):
         client.create_collection(
             collection_name="prescriptions",
-            vectors_config={
-                "dense": models.VectorParams(size=768, distance=models.Distance.COSINE)
-            },
-            sparse_vectors_config={
-                "sparse": models.SparseVectorParams()
-            }
+            vectors_config=models.VectorParams(size=768, distance=models.Distance.COSINE)
         )
 
 # Initialize on import
@@ -190,37 +185,21 @@ def get_user_by_username(username):
 # --- Prescription History and Hybrid Search ---
 
 def save_prescription(user_id, image_name, extracted_text, raw_meds, explanation, lang_code, translated_explanation):
-    """Save parsed prescription to Qdrant using hybrid dense + sparse index."""
-    # Concatenate texts for sparse + dense representation
+    """Save parsed prescription to Qdrant using dense index."""
+    # Concatenate texts for representation
     full_text = f"{extracted_text} {json.dumps(raw_meds)} {explanation} {translated_explanation}"
     
-    # 1. Update TF-IDF sparse dictionary
-    vectorizer.update_with_doc(full_text)
-    
-    # 2. Get representations
+    # Get dense embedding representation
     dense_vec = get_dense_embedding(full_text, is_query=False)
-    sparse_indices, sparse_values = vectorizer.transform(full_text)
     
     presc_id = str(uuid.uuid4())
     
-    # Check if sparse vector is empty (vocab not fitted or empty doc)
-    if not sparse_indices:
-        # Fallback to single dimension empty sparse
-        sparse_indices = [0]
-        sparse_values = [0.0]
-        
     client.upsert(
         collection_name="prescriptions",
         points=[
             models.PointStruct(
                 id=presc_id,
-                vector={
-                    "dense": dense_vec,
-                    "sparse": models.SparseVector(
-                        indices=sparse_indices,
-                        values=sparse_values
-                    )
-                },
+                vector=dense_vec,
                 payload={
                     "user_id": user_id,
                     "image_name": image_name,
@@ -237,7 +216,7 @@ def save_prescription(user_id, image_name, extracted_text, raw_meds, explanation
     return presc_id
 
 def get_user_history(user_id, search_query=None):
-    """Retrieve history for a user, optionally performing hybrid dense + sparse search."""
+    """Retrieve history for a user, performing dense vector search if query is provided."""
     user_filter = models.Filter(
         must=[
             models.FieldCondition(
@@ -260,50 +239,17 @@ def get_user_history(user_id, search_query=None):
         items.sort(key=lambda x: x.get("timestamp", ""), reverse=True)
         return items
     
-    # Hybrid search query with reciprocal rank fusion (RRF)
+    # Dense vector search query
     query_dense = get_dense_embedding(search_query, is_query=True)
-    sparse_indices, sparse_values = vectorizer.transform(search_query)
     
-    if not sparse_indices:
-        sparse_indices = [0]
-        sparse_values = [0.0]
-        
-    # Execute hybrid search with query_points
     try:
-        response = client.query_points(
+        dense_search = client.search(
             collection_name="prescriptions",
-            prefetch=[
-                models.Prefetch(
-                    query=query_dense,
-                    using="dense",
-                    limit=20
-                ),
-                models.Prefetch(
-                    query=models.SparseVector(
-                        indices=sparse_indices,
-                        values=sparse_values
-                    ),
-                    using="sparse",
-                    limit=20
-                )
-            ],
-            query=models.FusionQuery(
-                fusion=models.Fusion.RRF
-            ),
+            query_vector=query_dense,
             query_filter=user_filter,
             limit=10
         )
-        return [{"id": pt.id, **pt.payload} for pt in response.points]
+        return [{"id": pt.id, **pt.payload} for pt in dense_search]
     except Exception as e:
-        print(f"Hybrid search query_points failed: {e}. Falling back to scrolling.")
-        # Fallback to search using only dense vector if RRF fails
-        try:
-            dense_search = client.search(
-                collection_name="prescriptions",
-                query_vector=("dense", query_dense),
-                query_filter=user_filter,
-                limit=10
-            )
-            return [{"id": pt.id, **pt.payload} for pt in dense_search]
-        except Exception:
-            return get_user_history(user_id)
+        print(f"Dense search query failed: {e}. Falling back to scrolling.")
+        return get_user_history(user_id)
