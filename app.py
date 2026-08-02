@@ -123,19 +123,20 @@ class MedicationDetail(BaseModel):
     brand: str = Field(description="The brand name of the medicine written on the prescription")
     generic: str = Field(description="The generic / active chemical ingredient name of the medicine (e.g. Paracetamol for Crocin)")
     dosage: str = Field(description="The dosage and instructions (e.g., 1 tablet twice daily after food)")
-    purpose: str = Field(description="Simple explanation of what this medicine is used for")
+    purpose: str = Field(description="A brief summary of what this medicine is used for")
+    benefits: str = Field(description="Detailed health benefits, clinical role, and how it helps the patient's condition in patient-friendly terms")
 
 class PrescriptionAnalysis(BaseModel):
     medications: List[MedicationDetail] = Field(description="List of all detected medications in the prescription")
     english_explanation: str = Field(description="A warm, simple, plain English explanation of what the prescription means overall, including each medicine's role, and general instructions.")
     what_to_watch_out_for: str = Field(description="Key warnings, side effects, or general lifestyle advice related to this prescription.")
-    translated_explanation: str = Field(description="The complete prescription explanation (including medicines list, dosages, purpose, and warnings) translated directly into the target Indian language. Write this entire explanation in the native script of the target language (e.g. Devanagari script for Hindi, Tamil script for Tamil, Bengali script for Bengali). Keep generic names in English script in brackets.")
+    translated_explanation: str = Field(description="The complete prescription explanation (including medicines list, dosages, purpose, benefits, and warnings) translated directly into the target Indian language. Write this entire explanation in the native script of the target language (e.g. Devanagari script for Hindi, Tamil script for Tamil, Bengali script for Bengali). Keep generic names in English script in brackets.")
 
 def analyze_prescription_image(image: Image.Image, target_lang_name: str) -> PrescriptionAnalysis:
     """Invokes Gemini's structured output generation on the prescription image."""
     model = genai.GenerativeModel("gemini-3.5-flash")
-    prompt = f"""Analyze this handwritten prescription image. Extract all the medications listed, identifying both their brand names and generic/active ingredient names, dosages, and purposes. 
-Explain it in simple, plain, and concise terms (avoiding verbose filler) that an ordinary person would understand. Be warm and supportive, but clear. Always emphasize checking in with their doctor.
+    prompt = f"""Analyze this handwritten prescription image. Extract all the medications listed, identifying both their brand names and generic/active ingredient names, dosages, purposes, and detailed health benefits. 
+Explain the benefits of each medicine in a supportive, patient-friendly way, explaining why it was prescribed and how it helps their body. Always emphasize checking in with their doctor.
 
 IMPORTANT: In the 'translated_explanation' field, write the complete translation of the overall explanation, dosages, and warnings directly into {target_lang_name} using its native script (e.g. Devanagari for Hindi). Keep descriptions clear and concise."""
     
@@ -516,25 +517,29 @@ else:
                                 "brand": "Ecosprin 75 mg",
                                 "generic": "aspirin",
                                 "dosage": "1 tablet daily after lunch",
-                                "purpose": "Blood thinner to prevent heart attacks and strokes."
+                                "purpose": "Blood thinner to prevent heart attacks and strokes.",
+                                "benefits": "Prevents blood cells (platelets) from clumping together to form blood clots. This drastically reduces the risk of heart attacks, ischemic strokes, and protects cardiovascular health."
                             },
                             {
                                 "brand": "Warfarin 5 mg",
                                 "generic": "warfarin",
                                 "dosage": "1 tablet daily at 9:00 PM",
-                                "purpose": "Blood thinner to treat or prevent blood clots."
+                                "purpose": "Blood thinner to treat or prevent blood clots.",
+                                "benefits": "Slows down the body's process of making clots. It prevents existing clots from growing larger and stops new clots from forming in the blood vessels or heart."
                             },
                             {
                                 "brand": "Glycomet 500 mg",
                                 "generic": "metformin",
                                 "dosage": "1 tablet twice daily before meals (morning & night)",
-                                "purpose": "Blood sugar regulation for managing Type 2 Diabetes."
+                                "purpose": "Blood sugar regulation for managing Type 2 Diabetes.",
+                                "benefits": "Improves insulin sensitivity, decreases the amount of sugar absorbed from your food, and lowers the amount of sugar produced by your liver, keeping blood glucose levels stable."
                             },
                             {
                                 "brand": "Lipvas 10 mg",
                                 "generic": "atorvastatin",
                                 "dosage": "1 tablet at bedtime",
-                                "purpose": "Lowers high cholesterol and protects cardiovascular health."
+                                "purpose": "Lowers high cholesterol and protects cardiovascular health.",
+                                "benefits": "Works in the liver to block the enzyme responsible for producing cholesterol. This lowers 'bad' LDL cholesterol and triglycerides while raising 'good' HDL cholesterol, preventing plaque buildup in arteries."
                             }
                         ],
                         "english_explanation": "This prescription has been issued for managing cardiovascular health (heart protection), blood thickness, and Type 2 diabetes. It is a combined therapy to keep your blood flowing smoothly and regulate your blood sugar.",
@@ -564,7 +569,8 @@ else:
                         "brand": item["brand"],
                         "generic": item["generic"],
                         "dosage": item["dosage"],
-                        "purpose": item["purpose"]
+                        "purpose": item["purpose"],
+                        "benefits": item.get("benefits", item.get("purpose", ""))
                     })
                     
                 # Check conflicts using generic names
