@@ -35,7 +35,7 @@ from typing import List
 
 # Configure Page Config first
 st.set_page_config(
-    page_title="RxMate 💊 — Your Indian Language Prescription Guide",
+    page_title="DoseMate 💊 — Your Indian Language Prescription Guide",
     page_icon="💊",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -279,7 +279,7 @@ if "selected_prescription" not in st.session_state:
 
 # --- User Auth Screens ---
 if st.session_state.current_user is None:
-    st.markdown("<h1 style='text-align: center; color: #0F4C5C;'>RxMate 💊</h1>", unsafe_allow_html=True)
+    st.markdown("<h1 style='text-align: center; color: #0F4C5C;'>DoseMate 💊</h1>", unsafe_allow_html=True)
     st.markdown("<p style='text-align: center; font-size: 1.15rem; margin-bottom: 5px;'>Your plain-language medical prescription guide in your own Indian language.</p>", unsafe_allow_html=True)
     st.write("---")
     col1, col2, col3 = st.columns([1, 2, 1])
@@ -359,11 +359,11 @@ with st.sidebar:
         st.write("No prescription history found.")
 
 # --- Main Window Dashboard ---
-st.markdown("<div class='logo-container'><h1 class='main-header'>RxMate 💊</h1></div>", unsafe_allow_html=True)
+st.markdown("<div class='logo-container'><h1 class='main-header'>DoseMate 💊</h1></div>", unsafe_allow_html=True)
 st.write("Translate prescription brand names into plain language and check for interactions instantly.")
 
 # Collapsible expander displaying workflow & LLM details
-with st.expander("💡 How RxMate Works & LLM Technology Stack Details", expanded=False):
+with st.expander("💡 How DoseMate Works & LLM Technology Stack Details", expanded=False):
     try:
         workflow_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "workflow_and_llm.html")
         with open(workflow_path, "r", encoding="utf-8") as f:
@@ -721,4 +721,4 @@ else:
 
 # --- Global Footer ---
 st.markdown("---")
-st.markdown("<p style='text-align: center; color: gray; font-size: 0.8rem;'>RxMate 💊 © 2026. Made with ❤️ to simplify health access across India.</p>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center; color: gray; font-size: 0.8rem;'>DoseMate 💊 © 2026. Made with ❤️ to simplify health access across India.</p>", unsafe_allow_html=True)
