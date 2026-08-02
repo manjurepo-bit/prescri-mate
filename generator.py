@@ -9,6 +9,18 @@ from reportlab.pdfbase.ttfonts import TTFont
 
 from translator import LANGUAGES
 import streamlit as st
+import re
+
+def wrap_english_text(text):
+    """
+    Finds sequences containing Latin characters (along with numbers, spaces, and punctuation)
+    and wraps them in a <font name='Helvetica'>...</font> tag to ensure they render properly
+    in ReportLab even when using a regional font.
+    """
+    # Escape XML characters to prevent parsing errors in ReportLab Paragraph
+    escaped_text = text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+    pattern = r'([A-Za-z0-9\s\(\)\[\]\-\:\,\.\+\/\*]*[A-Za-z][A-Za-z0-9\s\(\)\[\]\-\:\,\.\+\/\*]*)'
+    return re.sub(pattern, r"<font name='Helvetica'>\1</font>", escaped_text)
 
 # Fonts path
 FONTS_DIR = "c:/genai/apps/prescimate/fonts"
@@ -314,7 +326,8 @@ def generate_pdf_explanation(filepath, username, image_name, date_str, medicines
     story.append(Paragraph("Explanation (English)", h2_style))
     for line in english_expl.split('\n'):
         if line.strip():
-            story.append(Paragraph(line, body_style))
+            escaped_line = line.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+            story.append(Paragraph(escaped_line, body_style))
             
     story.append(Spacer(1, 15))
     
@@ -333,7 +346,8 @@ def generate_pdf_explanation(filepath, username, image_name, date_str, medicines
         
     for line in translated_expl.split('\n'):
         if line.strip():
-            story.append(Paragraph(line, translation_body_style))
+            processed_line = wrap_english_text(line)
+            story.append(Paragraph(processed_line, translation_body_style))
             
     # Build document
     doc.build(story, onFirstPage=add_header_footer, onLaterPages=add_header_footer)
