@@ -642,18 +642,18 @@ else:
                 extracted_meds = []
                 meds_table_data = []
                 
-                for item in analysis["medications"]:
-                    extracted_meds.append(item["brand"])
-                    # Standardize generic check
-                    generic_name = item["generic"]
+                for item in analysis.get("medications", []):
+                    brand_name = item.get("brand", "N/A")
+                    generic_name = item.get("generic", "N/A")
+                    extracted_meds.append(brand_name)
                     extracted_meds.append(generic_name)
                     
                     meds_table_data.append({
-                        "brand": item["brand"],
-                        "generic": item["generic"],
-                        "dosage": item["dosage"],
-                        "purpose": item["purpose"],
-                        "benefits": item.get("benefits", item.get("purpose", ""))
+                        "brand": brand_name,
+                        "generic": generic_name,
+                        "dosage": item.get("dosage", "N/A"),
+                        "purpose": item.get("purpose", "N/A"),
+                        "benefits": item.get("benefits", item.get("purpose", "N/A"))
                     })
                     
                 # Check conflicts using generic names
