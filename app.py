@@ -414,19 +414,18 @@ if st.session_state.selected_prescription:
     
     dt_str = datetime.fromisoformat(current_presc['timestamp']).strftime("%d/%m/%Y")
     
-    # Generate the PDF file on demand (only if it doesn't already exist)
-    if not os.path.exists(pdf_path):
-        generate_pdf_explanation(
-            pdf_path,
-            user["username"],
-            current_presc["image_name"],
-            dt_str,
-            meds_data,
-            current_presc["explanation"],
-            current_presc["lang_code"],
-            current_presc["translated_explanation"],
-            interactions
-        )
+    # Generate the PDF file on demand (always regenerate to ensure layout/formatting updates are reflected)
+    generate_pdf_explanation(
+        pdf_path,
+        user["username"],
+        current_presc["image_name"],
+        dt_str,
+        meds_data,
+        current_presc["explanation"],
+        current_presc["lang_code"],
+        current_presc["translated_explanation"],
+        interactions
+    )
     
     with open(pdf_path, "rb") as f:
         pdf_bytes = f.read()
