@@ -148,7 +148,39 @@ IMPORTANT: In the 'translated_explanation' field, write the complete translation
         }
     )
     
-    data = json.loads(response.text)
+    raw_text = response.text.strip()
+    # Strip markdown code blocks if the model wrapped them
+    if raw_text.startswith("```"):
+        if raw_text.startswith("```json"):
+            raw_text = raw_text[7:]
+        else:
+            raw_text = raw_text[3:]
+        if raw_text.endswith("```"):
+            raw_text = raw_text[:-3]
+        raw_text = raw_text.strip()
+
+    # Escape raw/unescaped carriage returns and newlines inside JSON string fields to prevent parsing errors
+    in_string = False
+    escape = False
+    cleaned_chars = []
+    for char in raw_text:
+        if char == '"' and not escape:
+            in_string = not in_string
+        
+        if char == '\\' and not escape:
+            escape = True
+        else:
+            escape = False
+            
+        if in_string and char == '\n':
+            cleaned_chars.append('\\n')
+        elif in_string and char == '\r':
+            cleaned_chars.append('\\r')
+        else:
+            cleaned_chars.append(char)
+            
+    cleaned_text = "".join(cleaned_chars)
+    data = json.loads(cleaned_text)
     return data
 
 # Streamlit CSS Customization (Premium look and feel)
