@@ -29,13 +29,13 @@ def translate_via_gemini(text: str, target_lang_name: str) -> str:
         return f"[Translation Error: Gemini API key missing] {text}"
         
     try:
-        model = genai.GenerativeModel("gemini-3.5-flash")
+        model = genai.GenerativeModel("gemini-1.5-flash") # Use stable gemini-1.5-flash
         prompt = f"""You are an expert translator specializing in medical communications for Indian patients.
 Translate the following prescription analysis and warning notes into {target_lang_name}.
 
 Translation guidelines:
 1. Make it sound simple, clear, and natural to a person living in a rural area or small town in India.
-2. Keep generic drug names in English script or in brackets (e.g. Paracetamol) so patients can recognize the packaging.
+2. Keep ALL medicine brand names and generic names (e.g. TRESIBA, HUMINSULIN R, SEMASIZE) in English script or in brackets (e.g. Tresiba (degludec)) so patients can recognize the packaging. Do not translate or omit them.
 3. Keep the tone compassionate, helpful, and clear.
 
 Text to translate:
@@ -70,27 +70,10 @@ def translate_via_sarvam(text: str, target_lang_code: str, api_key: str) -> str:
 def translate_explanation(text: str, target_language_name: str) -> str:
     """
     Translates the text into the target language.
-    Checks for SARVAM_API_KEY environment variable. If available, uses Sarvam AI.
-    Otherwise, falls back to Gemini translation.
+    To ensure medical safety and preserve brand/generic names in English script inside brackets,
+    we use Gemini's translation engine which is highly robust for mixed-script medical text.
     """
     if target_language_name not in LANGUAGES:
         return text # Return original English if not supported
         
-    lang_info = LANGUAGES[target_language_name]
-    target_code = lang_info["code"]
-    
-    # Check if Sarvam API key is configured
-    sarvam_key = os.environ.get("SARVAM_API_KEY", "").strip()
-    
-    if sarvam_key:
-        try:
-            print(f"Translating to {target_language_name} using Sarvam AI...")
-            return translate_via_sarvam(text, target_code, sarvam_key)
-        except Exception as e:
-            print(f"Sarvam AI translation error: {e}. Falling back to Gemini...")
-            # Fall back to Gemini
-            return translate_via_gemini(text, target_language_name)
-    else:
-        # Default fallback to Gemini
-        print(f"No Sarvam API key found. Translating to {target_language_name} using Gemini...")
-        return translate_via_gemini(text, target_language_name)
+    return translate_via_gemini(text, target_language_name)
