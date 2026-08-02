@@ -199,6 +199,24 @@ def generate_pdf_explanation(filepath, username, image_name, date_str, medicines
         spaceAfter=8
     )
     
+    table_header_style = ParagraphStyle(
+        'TableHeaderText',
+        parent=styles['Normal'],
+        fontName='Helvetica-Bold',
+        fontSize=10,
+        leading=13,
+        textColor=colors.white
+    )
+    
+    table_body_style = ParagraphStyle(
+        'TableBodyText',
+        parent=styles['Normal'],
+        fontName='Helvetica',
+        fontSize=9,
+        leading=12,
+        textColor=dark_text
+    )
+    
     translation_body_style = ParagraphStyle(
         'TranslationBodyText',
         parent=styles['BodyText'],
@@ -237,31 +255,30 @@ def generate_pdf_explanation(filepath, username, image_name, date_str, medicines
     # --- Section: Extracted Medicines Table ---
     story.append(Paragraph("Detected Medications", h2_style))
     
-    table_content = [["No.", "Medicine / Brand Name", "Active Ingredient", "Dosage & Frequency"]]
+    table_content = [[
+        Paragraph("<b>No.</b>", table_header_style),
+        Paragraph("<b>Medicine / Brand Name</b>", table_header_style),
+        Paragraph("<b>Active Ingredient</b>", table_header_style),
+        Paragraph("<b>Dosage & Frequency</b>", table_header_style)
+    ]]
     for idx, med in enumerate(medicines_table_data, 1):
         table_content.append([
-            str(idx),
-            med.get("brand", "N/A"),
-            med.get("generic", "N/A"),
-            med.get("dosage", "N/A")
+            Paragraph(str(idx), table_body_style),
+            Paragraph(med.get("brand", "N/A"), table_body_style),
+            Paragraph(med.get("generic", "N/A"), table_body_style),
+            Paragraph(med.get("dosage", "N/A"), table_body_style)
         ])
         
-    meds_table = Table(table_content, colWidths=[30, 160, 160, 172])
+    meds_table = Table(table_content, colWidths=[30, 140, 140, 212])
     meds_table.setStyle(TableStyle([
         ('BACKGROUND', (0, 0), (-1, 0), primary_color),
-        ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
         ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
-        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-        ('FONTSIZE', (0, 0), (-1, 0), 10),
-        ('BOTTOMPADDING', (0, 0), (-1, 0), 6),
-        ('TOPPADDING', (0, 0), (-1, 0), 6),
+        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
         ('BACKGROUND', (0, 1), (-1, -1), bg_light),
-        ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
-        ('FONTSIZE', (0, 1), (-1, -1), 9),
         ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor("#dddddd")),
         ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, bg_light]),
-        ('TOPPADDING', (0, 1), (-1, -1), 6),
-        ('BOTTOMPADDING', (0, 1), (-1, -1), 6),
+        ('TOPPADDING', (0, 0), (-1, -1), 8),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 8),
     ]))
     story.append(meds_table)
     story.append(Spacer(1, 15))
