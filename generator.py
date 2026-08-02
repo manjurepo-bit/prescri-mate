@@ -259,17 +259,19 @@ def generate_pdf_explanation(filepath, username, image_name, date_str, medicines
         Paragraph("<b>No.</b>", table_header_style),
         Paragraph("<b>Medicine / Brand Name</b>", table_header_style),
         Paragraph("<b>Active Ingredient</b>", table_header_style),
-        Paragraph("<b>Dosage & Frequency</b>", table_header_style)
+        Paragraph("<b>Dosage & Frequency</b>", table_header_style),
+        Paragraph("<b>Health Benefits</b>", table_header_style)
     ]]
     for idx, med in enumerate(medicines_table_data, 1):
         table_content.append([
             Paragraph(str(idx), table_body_style),
             Paragraph(med.get("brand", "N/A"), table_body_style),
             Paragraph(med.get("generic", "N/A"), table_body_style),
-            Paragraph(med.get("dosage", "N/A"), table_body_style)
+            Paragraph(med.get("dosage", "N/A"), table_body_style),
+            Paragraph(med.get("benefits", med.get("purpose", "N/A")), table_body_style)
         ])
         
-    meds_table = Table(table_content, colWidths=[30, 140, 140, 212])
+    meds_table = Table(table_content, colWidths=[30, 110, 100, 120, 163])
     meds_table.setStyle(TableStyle([
         ('BACKGROUND', (0, 0), (-1, 0), primary_color),
         ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
