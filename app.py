@@ -130,9 +130,9 @@ class PrescriptionAnalysis(BaseModel):
     patient_name: str = Field(description="The name of the patient written on the prescription (e.g. HARAMOHAN KUANAR). If not found, write 'N/A'.")
     date_of_visit: str = Field(description="The date of the visit or the date when the prescription was written as found on the prescription image (e.g. 28/07/2026). If not found, write 'N/A'.")
     medications: List[MedicationDetail] = Field(description="List of all detected medications in the prescription")
-    english_explanation: str = Field(description="A warm, simple, plain English explanation of what the prescription means overall. Format this explanation as a numbered, itemized list (one medication per line, e.g. 1. Tresiba (degludec): ..., 2. Huminsulin R (regular insulin): ...) to make it highly legible.")
-    what_to_watch_out_for: str = Field(description="Key warnings, side effects, or general lifestyle advice related to this prescription.")
-    translated_explanation: str = Field(description="The complete prescription explanation translated directly into the target Indian language. Format this explanation as a numbered, itemized list (one medication per line, e.g. 1. Tresiba (degludec): ..., 2. Huminsulin R (regular insulin): ...) rather than a paragraph block. Write this entire explanation in the native script of the target language (e.g. Devanagari script for Hindi, Tamil script for Tamil, Bengali script for Bengali). Ensure that all medicine brand names and generic names (e.g. TRESIBA, HUMINSULIN R, SEMASIZE) are kept in English script inside parentheses (e.g. Tresiba (degludec)) directly in the translated explanation. Do not translate or transliterate the actual brand/generic names of medicines into local script.")
+    english_explanation: List[str] = Field(description="A warm, simple, plain English explanation points. Return this as a list of strings, with each medicine's explanation and general instructions as a separate item in the list.")
+    what_to_watch_out_for: List[str] = Field(description="Key warnings, side effects, or general lifestyle advice related to this prescription, returned as a list of strings.")
+    translated_explanation: List[str] = Field(description="The complete prescription explanation translated directly into the target Indian language. Return this as a list of strings, with each medicine/point as a separate item. Write this entire explanation in the native script of the target language (e.g. Devanagari script for Hindi, Tamil script for Tamil, Bengali script for Bengali). Ensure that all medicine brand names and generic names (e.g. TRESIBA, HUMINSULIN R, SEMASIZE) are kept in English script inside parentheses (e.g. Tresiba (degludec)) directly in the translated explanation. Do not translate or transliterate the actual brand/generic names of medicines into local script.")
 
 def analyze_prescription_image(image: Image.Image, target_lang_name: str) -> PrescriptionAnalysis:
     """Invokes Gemini's structured output generation on the prescription image."""
@@ -141,7 +141,7 @@ def analyze_prescription_image(image: Image.Image, target_lang_name: str) -> Pre
 Explain the benefits of each medicine in a supportive, patient-friendly way, explaining why it was prescribed and how it helps their body. Always emphasize checking in with their doctor.
 
 IMPORTANT FORMATTING RULES:
-1. Both the 'english_explanation' and the 'translated_explanation' fields MUST present their explanations as a numbered list (e.g., '1. Tresiba (degludec): ...', '2. Huminsulin R (regular insulin): ...'), with each medicine starting on a new line. Do NOT combine the medicine explanations into a single paragraph block.
+1. The fields 'english_explanation', 'what_to_watch_out_for', and 'translated_explanation' MUST be JSON lists of strings. Each medication's detail, explanation point, or general warning should be a separate element in the list. Do NOT join them into one long string or paragraph.
 2. In the 'translated_explanation' field, write the complete translation directly into {target_lang_name} using its native script (e.g. Devanagari for Hindi). Ensure that all medicine brand names and generic names (e.g. TRESIBA, HUMINSULIN R, SEMASIZE) are kept in English script inside parentheses (e.g. Tresiba (degludec)) directly in the translated explanation. Do not translate or transliterate the actual brand/generic names of medicines into local script or strip them out."""
     
     response = model.generate_content(
@@ -435,11 +435,11 @@ if st.session_state.selected_prescription:
         st.table(numbered_meds)
         
         st.write("### Plain English Explanation")
-        st.write(current_presc["explanation"])
+        st.markdown(current_presc["explanation"])
         
     with tab2:
         st.subheader(f"Explanation in {current_presc['lang_code']}")
-        st.write(current_presc["translated_explanation"])
+        st.markdown(current_presc["translated_explanation"])
         
     with tab3:
         st.write("### Drug Interaction Audit")
@@ -616,8 +616,17 @@ else:
                                 "benefits": "Works in the liver to block the enzyme responsible for producing cholesterol. This lowers 'bad' LDL cholesterol and triglycerides while raising 'good' HDL cholesterol, preventing plaque buildup in arteries."
                             }
                         ],
-                        "english_explanation": "This prescription has been issued for managing cardiovascular health (heart protection), blood thickness, and Type 2 diabetes. It is a combined therapy to keep your blood flowing smoothly and regulate your blood sugar.",
-                        "what_to_watch_out_for": "1. Bleeding Risk: Ecosprin (Aspirin) and Warfarin are both blood thinners. Using them together dramatically increases the risk of internal bleeding. Monitor for unusual bruising, nosebleeds, or dark stools.\n2. Diabetes check: Monitor your blood sugar regularly while on Glycomet.\n3. Take Lipvas at bedtime as cholesterol synthesis peaks during sleep."
+                        "english_explanation": [
+                            "Ecosprin 75 mg (aspirin): A blood thinner taken once daily after lunch to prevent heart attacks and strokes.",
+                            "Warfarin 5 mg (warfarin): A blood thinner taken once daily at 9:00 PM to treat or prevent blood clots.",
+                            "Glycomet 500 mg (metformin): A blood sugar regulator taken twice daily before meals (morning & night) to manage Type 2 Diabetes.",
+                            "Lipvas 10 mg (atorvastatin): A cholesterol-lowering medication taken once daily at bedtime to protect cardiovascular health."
+                        ],
+                        "what_to_watch_out_for": [
+                            "Bleeding Risk: Ecosprin (Aspirin) and Warfarin are both blood thinners. Using them together dramatically increases the risk of internal bleeding. Monitor for unusual bruising, nosebleeds, or dark stools.",
+                            "Diabetes check: Monitor your blood sugar regularly while on Glycomet.",
+                            "Take Lipvas at bedtime as cholesterol synthesis peaks during sleep."
+                        ]
                     }
                 else:
                     # 1. OCR and analysis using Gemini
@@ -652,14 +661,31 @@ else:
                 detected_interactions = check_drug_interactions(generic_only)
                 
                 # 3. Compile explanation
-                full_eng_explanation = f"{analysis['english_explanation']}\n\n**Things to watch out for:**\n{analysis['what_to_watch_out_for']}"
+                eng_list = analysis.get('english_explanation', [])
+                watch_list = analysis.get('what_to_watch_out_for', [])
+                
+                if isinstance(eng_list, list):
+                    eng_formatted = "\n".join([f"{idx}. {item}" for idx, item in enumerate(eng_list, 1)])
+                else:
+                    eng_formatted = str(eng_list)
+                    
+                if isinstance(watch_list, list):
+                    watch_formatted = "\n".join([f"- {item}" for item in watch_list])
+                else:
+                    watch_formatted = str(watch_list)
+                    
+                full_eng_explanation = f"{eng_formatted}\n\n**Things to watch out for:**\n{watch_formatted}"
                 
                 # 4. Translation
                 # Prioritize Gemini's high-quality single-pass translation which preserves English brand/generic names.
                 # Only run translate_explanation (Sarvam/Fallback) if the translation is missing, or if we are in demo mode.
                 translated_expl = ""
                 if not use_demo:
-                    translated_expl = analysis.get("translated_explanation", "").strip()
+                    translated_list = analysis.get("translated_explanation", [])
+                    if isinstance(translated_list, list) and translated_list:
+                        translated_expl = "\n".join([f"{idx}. {item}" for idx, item in enumerate(translated_list, 1)])
+                    elif isinstance(translated_list, str):
+                        translated_expl = translated_list.strip()
                 
                 if not translated_expl:
                     sarvam_key = os.environ.get("SARVAM_API_KEY", "").strip()
