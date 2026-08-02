@@ -685,6 +685,7 @@ else:
                     "id": presc_id,
                     "user_id": user["id"],
                     "image_name": img_name,
+                    "extracted_text": json.dumps(analysis),
                     "raw_meds": meds_table_data,
                     "explanation": full_eng_explanation,
                     "lang_code": lang_selection,
