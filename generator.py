@@ -262,7 +262,7 @@ def generate_pdf_explanation(filepath, username, image_name, date_str, medicines
     
     # --- Title & Metadata ---
     story.append(Paragraph("PresciMate 💊 — Prescription Analysis", title_style))
-    story.append(Paragraph(f"Patient Name: {username} | Date of Visit: {date_of_visit} | Date Generated: {date_str} | Source File: {image_name}", subtitle_style))
+    story.append(Paragraph(f"Patient Name: {username} | Date of Visit: {date_of_visit} | Analysis report generated: {date_str} | Source File: {image_name}", subtitle_style))
     
     # --- Section: Extracted Medicines Table ---
     story.append(Paragraph("Detected Medications", h2_style))
