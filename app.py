@@ -127,18 +127,19 @@ class MedicationDetail(BaseModel):
     benefits: str = Field(description="Detailed health benefits, clinical role, and how it helps the patient's condition in patient-friendly terms")
 
 class PrescriptionAnalysis(BaseModel):
+    patient_name: str = Field(description="The name of the patient written on the prescription (e.g. HARAMOHAN KUANAR). If not found, write 'N/A'.")
     medications: List[MedicationDetail] = Field(description="List of all detected medications in the prescription")
     english_explanation: str = Field(description="A warm, simple, plain English explanation of what the prescription means overall, including each medicine's role, and general instructions.")
     what_to_watch_out_for: str = Field(description="Key warnings, side effects, or general lifestyle advice related to this prescription.")
-    translated_explanation: str = Field(description="The complete prescription explanation (including medicines list, dosages, purpose, benefits, and warnings) translated directly into the target Indian language. Write this entire explanation in the native script of the target language (e.g. Devanagari script for Hindi, Tamil script for Tamil, Bengali script for Bengali). Keep generic names in English script in brackets.")
+    translated_explanation: str = Field(description="The complete prescription explanation (including medicines list, dosages, purpose, benefits, and warnings) translated directly into the target Indian language. Write this entire explanation in the native script of the target language (e.g. Devanagari script for Hindi, Tamil script for Tamil, Bengali script for Bengali). Ensure that all medicine brand names and generic names (e.g. TRESIBA, HUMINSULIN R, SEMASIZE) are kept in English script inside parentheses (e.g. Tresiba (degludec)) directly in the translated explanation. Do not translate or transliterate the actual brand/generic names of medicines into local script.")
 
 def analyze_prescription_image(image: Image.Image, target_lang_name: str) -> PrescriptionAnalysis:
     """Invokes Gemini's structured output generation on the prescription image."""
     model = genai.GenerativeModel("gemini-3.5-flash")
-    prompt = f"""Analyze this handwritten prescription image. Extract all the medications listed, identifying both their brand names and generic/active ingredient names, dosages, purposes, and detailed health benefits. 
+    prompt = f"""Analyze this handwritten prescription image. Extract the patient name, and all the medications listed, identifying both their brand names and generic/active ingredient names, dosages, purposes, and detailed health benefits. 
 Explain the benefits of each medicine in a supportive, patient-friendly way, explaining why it was prescribed and how it helps their body. Always emphasize checking in with their doctor.
 
-IMPORTANT: In the 'translated_explanation' field, write the complete translation of the overall explanation, dosages, and warnings directly into {target_lang_name} using its native script (e.g. Devanagari for Hindi). Keep descriptions clear and concise."""
+IMPORTANT: In the 'translated_explanation' field, write the complete translation of the overall explanation, dosages, and warnings directly into {target_lang_name} using its native script (e.g. Devanagari for Hindi). Ensure that all medicine brand names and generic names (e.g. TRESIBA, HUMINSULIN R, SEMASIZE) are kept in English script inside parentheses (e.g. Tresiba (degludec)) directly in the translated explanation. Do not translate or transliterate the actual brand/generic names of medicines into local script or strip them out."""
     
     response = model.generate_content(
         [prompt, image],
@@ -391,7 +392,16 @@ if st.session_state.selected_prescription:
             st.session_state.selected_prescription = None
             st.rerun()
     with col_title:
+        # Extract patient name from stored prescription JSON
+        try:
+            analysis_data = json.loads(current_presc["extracted_text"])
+            patient_name = analysis_data.get("patient_name", "N/A")
+        except Exception:
+            patient_name = "N/A"
+            
         st.subheader(f"Viewing Saved Prescription: {current_presc['image_name']}")
+        if patient_name and patient_name != "N/A":
+            st.markdown(f"👤 **Patient Name:** {patient_name}")
         
     # DISPLAY PREVIOUS PRESCRIPTION
     tab1, tab2, tab3 = st.tabs(["Overview (English)", "Translated Explanation", "Interactions & Warnings"])
@@ -446,10 +456,19 @@ if st.session_state.selected_prescription:
     
     dt_str = datetime.fromisoformat(current_presc['timestamp']).strftime("%d/%m/%Y")
     
+    # Extract patient name from stored prescription JSON
+    try:
+        analysis_data = json.loads(current_presc["extracted_text"])
+        patient_name = analysis_data.get("patient_name", "N/A")
+        if patient_name == "N/A" or not patient_name:
+            patient_name = user["username"]
+    except Exception:
+        patient_name = user["username"]
+        
     # Generate the PDF file on demand (always regenerate to ensure layout/formatting updates are reflected)
     generate_pdf_explanation(
         pdf_path,
-        user["username"],
+        patient_name,  # Pass extracted patient name instead of account username
         current_presc["image_name"],
         dt_str,
         meds_data,
@@ -543,6 +562,7 @@ else:
                     time.sleep(0.5) # Fast local response
                     
                     analysis = {
+                        "patient_name": "Rajesh Kumar",
                         "medications": [
                             {
                                 "brand": "Ecosprin 75 mg",
@@ -612,23 +632,26 @@ else:
                 full_eng_explanation = f"{analysis['english_explanation']}\n\n**Things to watch out for:**\n{analysis['what_to_watch_out_for']}"
                 
                 # 4. Translation
-                # Use Sarvam AI if API key is present. Otherwise, pull the pre-computed translation from Gemini's single call.
-                sarvam_key = os.environ.get("SARVAM_API_KEY", "").strip()
-                if sarvam_key:
-                    st.write(f"🗣️ Translating medical explanation to {lang_selection} using Sarvam AI...")
-                    translated_expl = translate_explanation(full_eng_explanation, lang_selection)
-                else:
-                    st.write(f"🗣️ Retrieving translation to {lang_selection}...")
-                    if use_demo:
-                        # Translate the mock summary on the fly if key is present, otherwise show English
-                        if GEMINI_API_KEY:
-                            translated_expl = translate_explanation(full_eng_explanation, lang_selection)
-                        else:
-                            translated_expl = f"[Demo Translation Mode - API Key Missing. Showing English]:\n\n" + full_eng_explanation
+                # Prioritize Gemini's high-quality single-pass translation which preserves English brand/generic names.
+                # Only run translate_explanation (Sarvam/Fallback) if the translation is missing, or if we are in demo mode.
+                translated_expl = ""
+                if not use_demo:
+                    translated_expl = analysis.get("translated_explanation", "").strip()
+                
+                if not translated_expl:
+                    sarvam_key = os.environ.get("SARVAM_API_KEY", "").strip()
+                    if sarvam_key:
+                        st.write(f"🗣️ Translating medical explanation to {lang_selection} using Sarvam AI...")
+                        translated_expl = translate_explanation(full_eng_explanation, lang_selection)
                     else:
-                        translated_expl = analysis.get("translated_explanation", "")
-                        if not translated_expl:
-                            # Direct fallback
+                        st.write(f"🗣️ Translating medical explanation to {lang_selection}...")
+                        if use_demo:
+                            # Translate the mock summary on the fly if key is present, otherwise show English
+                            if GEMINI_API_KEY:
+                                translated_expl = translate_explanation(full_eng_explanation, lang_selection)
+                            else:
+                                translated_expl = f"[Demo Translation Mode - API Key Missing. Showing English]:\n\n" + full_eng_explanation
+                        else:
                             translated_expl = translate_explanation(full_eng_explanation, lang_selection)
                 
                 # 5. Save in database (Qdrant)
