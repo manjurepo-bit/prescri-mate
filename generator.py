@@ -18,63 +18,63 @@ os.makedirs(FONTS_DIR, exist_ok=True)
 LANGUAGE_FONTS = {
     "Hindi": {
         "name": "NotoSansDevanagari",
-        "file": "NotoSansDevanagari-Regular.ttf",
-        "url": "https://github.com/googlefonts/noto-fonts/raw/main/hinted/ttf/NotoSansDevanagari/NotoSansDevanagari-Regular.ttf"
+        "file": "NotoSansDevanagari-Regular-Full.ttf",
+        "url": "https://github.com/google/fonts/raw/main/ofl/notosansdevanagari/NotoSansDevanagari-Regular.ttf"
     },
     "Marathi": {
         "name": "NotoSansDevanagari",
-        "file": "NotoSansDevanagari-Regular.ttf",
-        "url": "https://github.com/googlefonts/noto-fonts/raw/main/hinted/ttf/NotoSansDevanagari/NotoSansDevanagari-Regular.ttf"
+        "file": "NotoSansDevanagari-Regular-Full.ttf",
+        "url": "https://github.com/google/fonts/raw/main/ofl/notosansdevanagari/NotoSansDevanagari-Regular.ttf"
     },
     "Tamil": {
         "name": "NotoSansTamil",
-        "file": "NotoSansTamil-Regular.ttf",
-        "url": "https://github.com/googlefonts/noto-fonts/raw/main/hinted/ttf/NotoSansTamil/NotoSansTamil-Regular.ttf"
+        "file": "NotoSansTamil-Regular-Full.ttf",
+        "url": "https://github.com/google/fonts/raw/main/ofl/notosanstamil/NotoSansTamil-Regular.ttf"
     },
     "Bengali": {
         "name": "NotoSansBengali",
-        "file": "NotoSansBengali-Regular.ttf",
-        "url": "https://github.com/googlefonts/noto-fonts/raw/main/hinted/ttf/NotoSansBengali/NotoSansBengali-Regular.ttf"
+        "file": "NotoSansBengali-Regular-Full.ttf",
+        "url": "https://github.com/google/fonts/raw/main/ofl/notosansbengali/NotoSansBengali-Regular.ttf"
     },
     "Telugu": {
         "name": "NotoSansTelugu",
-        "file": "NotoSansTelugu-Regular.ttf",
-        "url": "https://github.com/googlefonts/noto-fonts/raw/main/hinted/ttf/NotoSansTelugu/NotoSansTelugu-Regular.ttf"
+        "file": "NotoSansTelugu-Regular-Full.ttf",
+        "url": "https://github.com/google/fonts/raw/main/ofl/notosanstelugu/NotoSansTelugu-Regular.ttf"
     },
     "Gujarati": {
         "name": "NotoSansGujarati",
-        "file": "NotoSansGujarati-Regular.ttf",
-        "url": "https://github.com/googlefonts/noto-fonts/raw/main/hinted/ttf/NotoSansGujarati/NotoSansGujarati-Regular.ttf"
+        "file": "NotoSansGujarati-Regular-Full.ttf",
+        "url": "https://github.com/google/fonts/raw/main/ofl/notosansgujarati/NotoSansGujarati-Regular.ttf"
     },
     "Kannada": {
         "name": "NotoSansKannada",
-        "file": "NotoSansKannada-Regular.ttf",
-        "url": "https://github.com/googlefonts/noto-fonts/raw/main/hinted/ttf/NotoSansKannada/NotoSansKannada-Regular.ttf"
+        "file": "NotoSansKannada-Regular-Full.ttf",
+        "url": "https://github.com/google/fonts/raw/main/ofl/notosanskannada/NotoSansKannada-Regular.ttf"
     },
     "Malayalam": {
         "name": "NotoSansMalayalam",
-        "file": "NotoSansMalayalam-Regular.ttf",
-        "url": "https://github.com/googlefonts/noto-fonts/raw/main/hinted/ttf/NotoSansMalayalam/NotoSansMalayalam-Regular.ttf"
+        "file": "NotoSansMalayalam-Regular-Full.ttf",
+        "url": "https://github.com/google/fonts/raw/main/ofl/notosansmalayalam/NotoSansMalayalam-Regular.ttf"
     },
     "Odia": {
         "name": "NotoSansOriya",
-        "file": "NotoSansOriya-Regular.ttf",
-        "url": "https://github.com/googlefonts/noto-fonts/raw/main/hinted/ttf/NotoSansOriya/NotoSansOriya-Regular.ttf"
+        "file": "NotoSansOriya-Regular-Full.ttf",
+        "url": "https://github.com/google/fonts/raw/main/ofl/notosansoriya/NotoSansOriya-Regular.ttf"
     },
     "Punjabi": {
         "name": "NotoSansGurmukhi",
-        "file": "NotoSansGurmukhi-Regular.ttf",
-        "url": "https://github.com/googlefonts/noto-fonts/raw/main/hinted/ttf/NotoSansGurmukhi/NotoSansGurmukhi-Regular.ttf"
+        "file": "NotoSansGurmukhi-Regular-Full.ttf",
+        "url": "https://github.com/google/fonts/raw/main/ofl/notosansgurmukhi/NotoSansGurmukhi-Regular.ttf"
     },
     "Assamese": {
         "name": "NotoSansBengali",
-        "file": "NotoSansBengali-Regular.ttf",
-        "url": "https://github.com/googlefonts/noto-fonts/raw/main/hinted/ttf/NotoSansBengali/NotoSansBengali-Regular.ttf"
+        "file": "NotoSansBengali-Regular-Full.ttf",
+        "url": "https://github.com/google/fonts/raw/main/ofl/notosansbengali/NotoSansBengali-Regular.ttf"
     },
     "Urdu": {
         "name": "NotoNastaliqUrdu",
-        "file": "NotoNastaliqUrdu-Regular.ttf",
-        "url": "https://github.com/googlefonts/noto-fonts/raw/main/hinted/ttf/NotoNastaliqUrdu/NotoNastaliqUrdu-Regular.ttf"
+        "file": "NotoNastaliqUrdu-Regular-Full.ttf",
+        "url": "https://github.com/google/fonts/raw/main/ofl/notonastaliqurdu/NotoNastaliqUrdu-Regular.ttf"
     }
 }
 
