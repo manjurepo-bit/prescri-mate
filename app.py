@@ -128,6 +128,7 @@ class MedicationDetail(BaseModel):
 
 class PrescriptionAnalysis(BaseModel):
     patient_name: str = Field(description="The name of the patient written on the prescription (e.g. HARAMOHAN KUANAR). If not found, write 'N/A'.")
+    date_of_visit: str = Field(description="The date of the visit or the date when the prescription was written as found on the prescription image (e.g. 28/07/2026). If not found, write 'N/A'.")
     medications: List[MedicationDetail] = Field(description="List of all detected medications in the prescription")
     english_explanation: str = Field(description="A warm, simple, plain English explanation of what the prescription means overall, including each medicine's role, and general instructions.")
     what_to_watch_out_for: str = Field(description="Key warnings, side effects, or general lifestyle advice related to this prescription.")
@@ -136,7 +137,7 @@ class PrescriptionAnalysis(BaseModel):
 def analyze_prescription_image(image: Image.Image, target_lang_name: str) -> PrescriptionAnalysis:
     """Invokes Gemini's structured output generation on the prescription image."""
     model = genai.GenerativeModel("gemini-1.5-flash")
-    prompt = f"""Analyze this handwritten prescription image. Extract the patient name, and all the medications listed, identifying both their brand names and generic/active ingredient names, dosages, purposes, and detailed health benefits. 
+    prompt = f"""Analyze this handwritten prescription image. Extract the patient name, date of visit/prescription date, and all the medications listed, identifying both their brand names and generic/active ingredient names, dosages, purposes, and detailed health benefits. 
 Explain the benefits of each medicine in a supportive, patient-friendly way, explaining why it was prescribed and how it helps their body. Always emphasize checking in with their doctor.
 
 IMPORTANT: In the 'translated_explanation' field, write the complete translation of the overall explanation, dosages, and warnings directly into {target_lang_name} using its native script (e.g. Devanagari for Hindi). Ensure that all medicine brand names and generic names (e.g. TRESIBA, HUMINSULIN R, SEMASIZE) are kept in English script inside parentheses (e.g. Tresiba (degludec)) directly in the translated explanation. Do not translate or transliterate the actual brand/generic names of medicines into local script or strip them out."""
@@ -392,16 +393,24 @@ if st.session_state.selected_prescription:
             st.session_state.selected_prescription = None
             st.rerun()
     with col_title:
-        # Extract patient name from stored prescription JSON
+        # Extract patient name and date of visit from stored prescription JSON
         try:
             analysis_data = json.loads(current_presc["extracted_text"])
             patient_name = analysis_data.get("patient_name", "N/A")
+            date_of_visit = analysis_data.get("date_of_visit", "N/A")
         except Exception:
             patient_name = "N/A"
+            date_of_visit = "N/A"
             
         st.subheader(f"Viewing Saved Prescription: {current_presc['image_name']}")
+        meta_md = []
         if patient_name and patient_name != "N/A":
-            st.markdown(f"👤 **Patient Name:** {patient_name}")
+            meta_md.append(f"👤 **Patient Name:** {patient_name}")
+        if date_of_visit and date_of_visit != "N/A":
+            meta_md.append(f"📅 **Date of Visit:** {date_of_visit}")
+            
+        if meta_md:
+            st.markdown("  |  ".join(meta_md))
         
     # DISPLAY PREVIOUS PRESCRIPTION
     tab1, tab2, tab3 = st.tabs(["Overview (English)", "Translated Explanation", "Interactions & Warnings"])
@@ -456,14 +465,16 @@ if st.session_state.selected_prescription:
     
     dt_str = datetime.fromisoformat(current_presc['timestamp']).strftime("%d/%m/%Y")
     
-    # Extract patient name from stored prescription JSON
+    # Extract patient name and date of visit from stored prescription JSON
     try:
         analysis_data = json.loads(current_presc["extracted_text"])
         patient_name = analysis_data.get("patient_name", "N/A")
+        date_of_visit = analysis_data.get("date_of_visit", "N/A")
         if patient_name == "N/A" or not patient_name:
             patient_name = user["username"]
     except Exception:
         patient_name = user["username"]
+        date_of_visit = "N/A"
         
     # Generate the PDF file on demand (always regenerate to ensure layout/formatting updates are reflected)
     generate_pdf_explanation(
@@ -475,7 +486,8 @@ if st.session_state.selected_prescription:
         current_presc["explanation"],
         current_presc["lang_code"],
         current_presc["translated_explanation"],
-        interactions
+        interactions,
+        date_of_visit=date_of_visit
     )
     
     with open(pdf_path, "rb") as f:

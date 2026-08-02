@@ -130,7 +130,7 @@ def add_header_footer(canvas, doc):
     canvas.drawRightString(doc.pagesize[0] - 36, 32, f"Page {doc.page}")
     canvas.restoreState()
 
-def generate_pdf_explanation(filepath, username, image_name, date_str, medicines_table_data, english_expl, target_lang, translated_expl, interactions):
+def generate_pdf_explanation(filepath, username, image_name, date_str, medicines_table_data, english_expl, target_lang, translated_expl, interactions, date_of_visit="N/A"):
     """Generates a beautifully structured PDF document containing the prescription details and translations."""
     
     # Establish document template
@@ -250,7 +250,7 @@ def generate_pdf_explanation(filepath, username, image_name, date_str, medicines
     
     # --- Title & Metadata ---
     story.append(Paragraph("PresciMate 💊 — Prescription Analysis", title_style))
-    story.append(Paragraph(f"Patient Account: {username} | Date Generated: {date_str} | Source File: {image_name}", subtitle_style))
+    story.append(Paragraph(f"Patient Name: {username} | Date of Visit: {date_of_visit} | Date Generated: {date_str} | Source File: {image_name}", subtitle_style))
     
     # --- Section: Extracted Medicines Table ---
     story.append(Paragraph("Detected Medications", h2_style))
