@@ -136,7 +136,7 @@ class PrescriptionAnalysis(BaseModel):
 
 def analyze_prescription_image(image: Image.Image, target_lang_name: str) -> PrescriptionAnalysis:
     """Invokes Gemini's structured output generation on the prescription image."""
-    model = genai.GenerativeModel("gemini-1.5-flash")
+    model = genai.GenerativeModel("gemini-3.5-flash")
     prompt = f"""Analyze this handwritten prescription image. Extract the patient name, date of visit/prescription date, and all the medications listed, identifying both their brand names and generic/active ingredient names, dosages, purposes, and detailed health benefits. 
 Explain the benefits of each medicine in a supportive, patient-friendly way, explaining why it was prescribed and how it helps their body. Always emphasize checking in with their doctor.
 

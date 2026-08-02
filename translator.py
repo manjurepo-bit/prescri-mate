@@ -29,7 +29,7 @@ def translate_via_gemini(text: str, target_lang_name: str) -> str:
         return f"[Translation Error: Gemini API key missing] {text}"
         
     try:
-        model = genai.GenerativeModel("gemini-1.5-flash") # Use stable gemini-1.5-flash
+        model = genai.GenerativeModel("gemini-3.5-flash")
         prompt = f"""You are an expert translator specializing in medical communications for Indian patients.
 Translate the following prescription analysis and warning notes into {target_lang_name}.
 
