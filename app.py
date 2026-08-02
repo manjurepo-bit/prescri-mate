@@ -279,7 +279,7 @@ if "selected_prescription" not in st.session_state:
 
 # --- User Auth Screens ---
 if st.session_state.current_user is None:
-    st.markdown("<h1 style='text-align: center; color: #0F4C5C;'>PresciMate 💊</h1>", unsafe_allow_html=True)
+    st.markdown("<h1 style='text-align: center; color: #0F4C5C;'>RxMate 💊</h1>", unsafe_allow_html=True)
     st.markdown("<p style='text-align: center; font-size: 1.15rem; margin-bottom: 5px;'>Your plain-language medical prescription guide in your own Indian language.</p>", unsafe_allow_html=True)
     st.write("---")
     col1, col2, col3 = st.columns([1, 2, 1])
@@ -321,7 +321,7 @@ if st.session_state.current_user is None:
             about_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "about_card.html")
             with open(about_path, "r", encoding="utf-8") as f:
                 about_html = f.read()
-            st.markdown(about_html, unsafe_allow_html=True)
+            st.markdown(about_html.replace("\n", " ").replace("\r", " "), unsafe_allow_html=True)
         except Exception as e:
             st.error(f"Could not load application info: {e}")
     st.stop()
@@ -368,7 +368,7 @@ with st.expander("💡 How RxMate Works & LLM Technology Stack Details", expande
         workflow_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "workflow_and_llm.html")
         with open(workflow_path, "r", encoding="utf-8") as f:
             workflow_html = f.read()
-        st.markdown(workflow_html, unsafe_allow_html=True)
+        st.markdown(workflow_html.replace("\n", " ").replace("\r", " "), unsafe_allow_html=True)
     except Exception as e:
         st.error(f"Could not load workflow details: {e}")
 
