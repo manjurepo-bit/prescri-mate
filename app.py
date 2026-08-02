@@ -130,9 +130,9 @@ class PrescriptionAnalysis(BaseModel):
     patient_name: str = Field(description="The name of the patient written on the prescription (e.g. HARAMOHAN KUANAR). If not found, write 'N/A'.")
     date_of_visit: str = Field(description="The date of the visit or the date when the prescription was written as found on the prescription image (e.g. 28/07/2026). If not found, write 'N/A'.")
     medications: List[MedicationDetail] = Field(description="List of all detected medications in the prescription")
-    english_explanation: str = Field(description="A warm, simple, plain English explanation of what the prescription means overall, including each medicine's role, and general instructions.")
+    english_explanation: str = Field(description="A warm, simple, plain English explanation of what the prescription means overall. Format this explanation as a numbered, itemized list (one medication per line, e.g. 1. Tresiba (degludec): ..., 2. Huminsulin R (regular insulin): ...) to make it highly legible.")
     what_to_watch_out_for: str = Field(description="Key warnings, side effects, or general lifestyle advice related to this prescription.")
-    translated_explanation: str = Field(description="The complete prescription explanation (including medicines list, dosages, purpose, benefits, and warnings) translated directly into the target Indian language. Write this entire explanation in the native script of the target language (e.g. Devanagari script for Hindi, Tamil script for Tamil, Bengali script for Bengali). Ensure that all medicine brand names and generic names (e.g. TRESIBA, HUMINSULIN R, SEMASIZE) are kept in English script inside parentheses (e.g. Tresiba (degludec)) directly in the translated explanation. Do not translate or transliterate the actual brand/generic names of medicines into local script.")
+    translated_explanation: str = Field(description="The complete prescription explanation translated directly into the target Indian language. Format this explanation as a numbered, itemized list (one medication per line, e.g. 1. Tresiba (degludec): ..., 2. Huminsulin R (regular insulin): ...) rather than a paragraph block. Write this entire explanation in the native script of the target language (e.g. Devanagari script for Hindi, Tamil script for Tamil, Bengali script for Bengali). Ensure that all medicine brand names and generic names (e.g. TRESIBA, HUMINSULIN R, SEMASIZE) are kept in English script inside parentheses (e.g. Tresiba (degludec)) directly in the translated explanation. Do not translate or transliterate the actual brand/generic names of medicines into local script.")
 
 def analyze_prescription_image(image: Image.Image, target_lang_name: str) -> PrescriptionAnalysis:
     """Invokes Gemini's structured output generation on the prescription image."""
@@ -140,7 +140,9 @@ def analyze_prescription_image(image: Image.Image, target_lang_name: str) -> Pre
     prompt = f"""Analyze this handwritten prescription image. Extract the patient name, date of visit/prescription date, and all the medications listed, identifying both their brand names and generic/active ingredient names, dosages, purposes, and detailed health benefits. 
 Explain the benefits of each medicine in a supportive, patient-friendly way, explaining why it was prescribed and how it helps their body. Always emphasize checking in with their doctor.
 
-IMPORTANT: In the 'translated_explanation' field, write the complete translation of the overall explanation, dosages, and warnings directly into {target_lang_name} using its native script (e.g. Devanagari for Hindi). Ensure that all medicine brand names and generic names (e.g. TRESIBA, HUMINSULIN R, SEMASIZE) are kept in English script inside parentheses (e.g. Tresiba (degludec)) directly in the translated explanation. Do not translate or transliterate the actual brand/generic names of medicines into local script or strip them out."""
+IMPORTANT FORMATTING RULES:
+1. Both the 'english_explanation' and the 'translated_explanation' fields MUST present their explanations as a numbered list (e.g., '1. Tresiba (degludec): ...', '2. Huminsulin R (regular insulin): ...'), with each medicine starting on a new line. Do NOT combine the medicine explanations into a single paragraph block.
+2. In the 'translated_explanation' field, write the complete translation directly into {target_lang_name} using its native script (e.g. Devanagari for Hindi). Ensure that all medicine brand names and generic names (e.g. TRESIBA, HUMINSULIN R, SEMASIZE) are kept in English script inside parentheses (e.g. Tresiba (degludec)) directly in the translated explanation. Do not translate or transliterate the actual brand/generic names of medicines into local script or strip them out."""
     
     response = model.generate_content(
         [prompt, image],
@@ -420,8 +422,17 @@ if st.session_state.selected_prescription:
         st.write("### Medications List")
         meds_data = current_presc["raw_meds"]
         
-        # Build tabular visualizer
-        st.table(meds_data)
+        # Build numbered tabular visualizer with user-friendly headers
+        numbered_meds = []
+        for idx, med in enumerate(meds_data, 1):
+            numbered_meds.append({
+                "No.": idx,
+                "Medicine / Brand Name": med.get("brand", "N/A"),
+                "Active Ingredient": med.get("generic", "N/A"),
+                "Dosage & Frequency": med.get("dosage", "N/A"),
+                "Health Benefits": med.get("benefits", med.get("purpose", "N/A"))
+            })
+        st.table(numbered_meds)
         
         st.write("### Plain English Explanation")
         st.write(current_presc["explanation"])
