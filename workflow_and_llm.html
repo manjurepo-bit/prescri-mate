@@ -1,0 +1,36 @@
+<div class="workflow-card" style="background-color: #f4f9f9; border-left: 5px solid #0F4C5C; padding: 20px; border-radius: 8px; margin-top: 15px; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); font-family: 'Outfit', sans-serif;">
+    <h4 style="color: #0F4C5C; margin-top: 0; margin-bottom: 15px; font-size: 1.15rem; font-weight: 600;">🧠 How RxMate Works & The LLM Technology</h4>
+    
+    <div style="font-size: 0.9rem; line-height: 1.6; color: #2f3e46;">
+        <p style="margin-bottom: 15px;">RxMate translates hard-to-read medical prescriptions into clear, regional guides through 6 key engineering steps:</p>
+        
+        <ol style="padding-left: 20px; margin-bottom: 15px;">
+            <li style="margin-bottom: 10px;">
+                <b>Step 1: Visual Reading (Google Gemini LLM)</b><br/>
+                We use the state-of-the-art <b>Gemini 3.5 Flash</b> vision model. When you upload a photo, the LLM analyzes the pixels directly to recognize messy, handwritten characters (OCR) that traditional scanners miss.
+            </li>
+            <li style="margin-bottom: 10px;">
+                <b>Step 2: Medical Details Extraction (Structured Output)</b><br/>
+                The Gemini LLM uses strict Pydantic schemas to ensure it extracts medicines without hallucinating. It separates each medicine's Brand Name, Active Chemical Ingredient, Dosage, and detailed Health Benefits.
+            </li>
+            <li style="margin-bottom: 10px;">
+                <b>Step 3: Drug Interaction Safety Check (NetworkX Graph)</b><br/>
+                We pass the extracted chemical ingredients into a <b>NetworkX Graph Database</b>. The graph instantly checks for safety issues (e.g., if you are prescribed two blood thinners like Aspirin and Warfarin at the same time, it flags a Major warning).
+            </li>
+            <li style="margin-bottom: 10px;">
+                <b>Step 4: Smart Translation (Mixed-Script Engine)</b><br/>
+                We translate the explanations into your chosen Indian language. To keep it safe, the translation engine translates the instructions into local script (like Hindi Devanagari) but preserves the brand/generic names in English script in brackets so you can match the packaging.
+            </li>
+            <li style="margin-bottom: 10px;">
+                <b>Step 5: Secure Qdrant Database Storage</b><br/>
+                Your prescription details are converted into numerical vector coordinates (embeddings) and stored in a private <b>Qdrant Vector Database</b>. This allows you to search your history instantly using natural search queries.
+            </li>
+            <li style="margin-bottom: 10px;">
+                <b>Step 6: Printable PDF Compilation (ReportLab)</b><br/>
+                On demand, the app builds a multi-page PDF report. It dynamically injects the correct Google Noto font file to support regional characters alongside English characters without formatting issues.
+            </li>
+        </ol>
+        
+        <p style="margin-top: 15px; font-weight: 600; color: #0F4C5C;">🔬 Always consult your doctor before modifying your medicine intake. RxMate is an AI assistant, not a clinical provider.</p>
+    </div>
+</div>
